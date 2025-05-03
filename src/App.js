@@ -5,6 +5,7 @@ import {
   Route, 
   Navigate
 } from "react-router-dom";
+
 import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
 import SuperAdminPage from "./pages/SuperAdminPage";
@@ -18,6 +19,7 @@ import PendingApproval from './pages/PendingApproval';
 
 function App() {
   return (
+    
     <Router>
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
@@ -56,6 +58,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
+
       </div>
     </Router>
   );

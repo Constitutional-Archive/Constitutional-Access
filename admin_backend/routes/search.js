@@ -1,40 +1,39 @@
 const express = require("express");
 const router = express.Router();
-const Metadata = require("../models/Metadata"); // adjust path if needed
+const Metadata = require("../models/Metadata");
 
-// Simple text + tag search
 router.get("/", async (req, res) => {
   try {
-    const { q, tags } = req.query;
+    const { q, category } = req.query;
     const query = {};
 
-    // Searching in the 'fileName', 'description', 'category', and 'uploadedBy' fields
-    if (q) {
+    // Text search
+    if (q && q.trim() !== "") {
+      const searchRegex = { $regex: q, $options: "i" };
       query.$or = [
-        { fileName: { $regex: q, $options: "i" } },
-        { description: { $regex: q, $options: "i" } },
-        { category: { $regex: q, $options: "i" } },
-        { uploadedBy: { $regex: q, $options: "i" } },
+        { fileName: searchRegex },
+        { description: searchRegex },
+        { uploadedBy: searchRegex }
       ];
     }
 
-    // Handling the 'tags' array query
-    if (tags) {
-      const tagArray = tags.split(",").map(tag => tag.trim());
-      query.tags = { $in: tagArray };
+    // Category filter (exact match)
+    if (category && category.trim() !== "") {
+      query.category = category;
     }
 
-    // Query the Metadata collection
-    const results = await Metadata.find(query).sort({ uploadedAt: -1 }).limit(50);
+    console.log("Executing query:", query);
 
-    // Format the response to match frontend expectations
+    const results = await Metadata.find(query)
+      .sort({ uploadedAt: -1 })
+      .limit(50);
+
     const formattedResults = results.map(doc => ({
       id: doc._id,
       title: doc.fileName || "Untitled",
       excerpt: doc.description || "No description available",
       type: doc.category || "Unknown",
-      relevance: `${Math.floor(Math.random() * 21) + 80}%`, // 80-100%
-      fileUrl: doc.fileUrl || "", // <-- Use what’s in the DB
+      fileUrl: doc.fileUrl || "",
       uploadedAt: doc.uploadedAt,
     }));
 
