@@ -36,7 +36,7 @@ const SearchHeader = ({ searchQuery, setSearchQuery, selectedCategory, setSelect
             checked: selectedCategory === cat.value,
             onChange: () => {
               const newCategory = selectedCategory === cat.value ? '' : cat.value;
-              setSelectedCategory(newCategory); 
+              setSelectedCategory(newCategory); //  Don't call handleSearch here
             },
           }),
           React.createElement('span', { className: 'ml-2' }, cat.label)
