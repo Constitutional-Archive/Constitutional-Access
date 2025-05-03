@@ -17,8 +17,10 @@ const SearchResults = ({ searchQuery, results }) => {
           className: 'border rounded-lg px-3 py-1.5 text-gray-600 bg-white shadow-sm'
         },
           React.createElement('option', null, 'All Types'),
-          React.createElement('option', null, 'PDF'),
-          React.createElement('option', null, 'Document')
+          React.createElement('option', null, 'Articles(documentation)'),
+          React.createElement('option', null, 'Audio'),
+          React.createElement('option', null, 'Video'),
+          React.createElement('option', null, 'image')
         )
       )
     ),
