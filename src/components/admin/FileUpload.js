@@ -1,6 +1,66 @@
 import React, { useState } from 'react';
 import { Upload, FolderTree, Edit, AlertCircle, X, Trash2 } from 'lucide-react';
 
+// Simple toast notification system
+const Toast = {
+  show: (message, type = 'success') => {
+    // Remove any existing toasts
+    const existingToasts = document.querySelectorAll('.custom-toast');
+    existingToasts.forEach(toast => toast.remove());
+
+    const toast = document.createElement('div');
+    toast.className = 'custom-toast';
+    toast.textContent = message;
+    
+    // Base styling
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    toast.style.zIndex = '1000';
+    toast.style.animation = 'fadeIn 0.3s, fadeOut 0.3s 2.7s';
+    toast.style.color = 'white';
+    toast.style.fontFamily = 'sans-serif';
+    toast.style.fontSize = '14px';
+    
+    // Type-specific styling
+    if (type === 'error') {
+      toast.style.backgroundColor = '#ef4444'; // red-500
+    } else if (type === 'loading') {
+      toast.style.backgroundColor = '#64748b'; // slate-500
+    } else {
+      toast.style.backgroundColor = '#4f46e5'; // indigo-600
+    }
+
+    // Add to document
+    document.body.appendChild(toast);
+
+    // Add animation styles
+    if (!document.getElementById('toast-animations')) {
+      const style = document.createElement('style');
+      style.id = 'toast-animations';
+      style.textContent = `
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(10px); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+};
+
 const FileUpload = ({ onFileSelect }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [editingFileIndex, setEditingFileIndex] = useState(null);
@@ -59,27 +119,34 @@ const FileUpload = ({ onFileSelect }) => {
   };
 
   const handleUpload = () => {
-    if (selectedFiles.some(file => !file.isValid)) return;
-  
+    if (selectedFiles.some(file => !file.isValid)) {
+      Toast.show('Please complete all metadata fields before uploading', 'error');
+      return;
+    }
+
     const filesToUpload = selectedFiles.map((item) => ({
       file: item.file,
       metadata: item.metadata, 
     }));
 
-    onFileSelect(filesToUpload);
-    setSelectedFiles([]);
+    // Show loading toast
+    Toast.show('Uploading files...', 'loading');
+
+    // Simulate upload process
+    setTimeout(() => {
+      onFileSelect(filesToUpload);
+      setSelectedFiles([]);
+      Toast.show('Upload complete!');
+    }, 1000);
   };
 
-  // New function to handle file deletion
   const handleFileDelete = (index) => {
     const updatedFiles = [...selectedFiles];
     updatedFiles.splice(index, 1);
     setSelectedFiles(updatedFiles);
-    // If we're deleting the file that's currently being edited, close the editor
     if (editingFileIndex === index) {
       setEditingFileIndex(null);
     } else if (editingFileIndex > index) {
-      // Adjust the editing index if needed
       setEditingFileIndex(editingFileIndex - 1);
     }
   };
