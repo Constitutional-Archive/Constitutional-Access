@@ -10,7 +10,8 @@ const SuperAdminPage = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL;
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+
 
   // ✅ Fetch users with roles (memoized to avoid eslint warning)
   const fetchUsers = useCallback(async () => {
