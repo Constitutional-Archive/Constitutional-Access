@@ -6,7 +6,7 @@
     "start": "node server.js",
     "predeploy": "echo Skipping tests before deploy",
     "deploy": "npm run build && echo Deploying...",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": "",
