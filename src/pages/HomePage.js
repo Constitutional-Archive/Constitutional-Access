@@ -50,7 +50,7 @@ const HomePage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-5xl font-extrabold"
         >
-          Moloko Tsiri
+          Consti Find
         </motion.h1>
         <motion.img
           src="/massort- contifind.png"
