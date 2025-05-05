@@ -1,22 +1,24 @@
 const request = require('supertest');
 const express = require('express');
-const app = require('../app');
+const app = express();
 const path = require('path');
 
-// Mock storage for uploaded files
+// Mock storage for uploaded files and metadata
 const uploadedFiles = [];
 const uploadedMetadata = [];
 
-// Override the /api/upload route for testing
+// Set up express app
+app.use(express.json()); // Middleware to handle JSON payloads
+
+// Override the /api/upload route for testing (simulating file upload)
 app.post('/api/upload', (req, res) => {
-  // Simulate receiving a file
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ message: 'No files uploaded' });
   }
 
   const fileUrls = req.files.map(file => ({
     originalname: file.originalname,
-    url: `http://localhost/uploads/${file.originalname}`
+    url: `http://localhost/uploads/${file.originalname}`,
   }));
 
   uploadedFiles.push(...fileUrls);
@@ -28,7 +30,7 @@ app.post('/api/upload', (req, res) => {
   });
 });
 
-// Override the /api/upload/metadata route for testing
+// Override the /api/upload/metadata route for testing (simulating metadata save)
 app.post('/api/upload/metadata', express.json(), (req, res) => {
   const { fileName, description, category, uploadedBy, tags, fileUrl } = req.body;
 
@@ -54,13 +56,16 @@ app.post('/api/upload/metadata', express.json(), (req, res) => {
 
 describe('POST /api/upload', () => {
   it('should successfully upload a file', async () => {
+    const filePath = path.resolve(__dirname, 'testfile.txt'); // Use an actual file path or mock this
     const res = await request(app)
       .post('/api/upload')
-      .attach('files', Buffer.from('dummy file content'), 'testfile.txt');
+      .attach('files', filePath) // Attach a real file or use mock data
+      .set('Content-Type', 'multipart/form-data');
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty('message', 'Files uploaded successfully');
     expect(Array.isArray(res.body.fileUrls)).toBe(true);
+    expect(res.body.fileUrls.length).toBeGreaterThan(0);
   });
 
   it('should successfully upload metadata', async () => {
@@ -95,13 +100,10 @@ describe('POST /api/upload', () => {
   it('should handle missing metadata fields', async () => {
     const res = await request(app)
       .post('/api/upload/metadata')
-      .send({})
+      .send({}) // Send empty data
       .set('Content-Type', 'application/json');
 
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty('message', 'Missing fields');
   });
 });
-
-
-
