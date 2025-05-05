@@ -16,7 +16,10 @@ const PrivateRoute = ({ children, requiredRoles = [] }) => {
   if (!isAuthenticated) return <Navigate to="/" />;
 
   // Get roles from token using your Auth0 custom namespace
-  const userRoles = user?.['https://constifind-api.com/roles'] || [];
+  const rolesNamespace = process.env.ROLES_NAMESPACE || 'https://constifind-api.com/roles';
+
+// Safely get roles from the user object
+  const userRoles = user?.[rolesNamespace] || [];
 
   // Debug: log current roles
   console.log('User roles:', userRoles);
