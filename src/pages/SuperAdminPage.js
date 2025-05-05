@@ -12,7 +12,7 @@ const SuperAdminPage = () => {
 
   const API_BASE = process.env.REACT_APP_API_BASE_URL;
 
-  // ✅ Fetch users with roles
+  // ✅ Fetch users with roles (memoized to avoid eslint warning)
   const fetchUsers = useCallback(async () => {
     try {
       const res = await axios.get(`${API_BASE}/api/auth0/users-with-roles`);
@@ -43,6 +43,7 @@ const SuperAdminPage = () => {
     }
   };
 
+  // ✅ Initial fetch
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
@@ -58,8 +59,8 @@ const SuperAdminPage = () => {
   }
 
   // ✅ Role filters
-  const usersWithNoRoles = users.filter(u => u.roles.length === 0);
   const usersWithAdminRole = users.filter(u => u.roles.includes('admin'));
+  const usersPendingApproval = users.filter(u => !u.roles.includes('admin')); // no role or new_user
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -68,22 +69,22 @@ const SuperAdminPage = () => {
         <h1 className="text-2xl font-bold">User Role Manager</h1>
       </header>
 
-      {/* New Users */}
+      {/* Pending Approval Users */}
       <section className="bg-white rounded-lg shadow p-6 mb-10">
         <h2 className="text-lg font-semibold mb-4 flex items-center">
           <Users className="h-5 w-5 text-yellow-500 mr-2" />
-          New Users (No Roles Assigned) ({usersWithNoRoles.length})
+          Pending Approval (Admin not assigned) ({usersPendingApproval.length})
         </h2>
         {loading ? (
           <p className="text-gray-500">Loading users...</p>
         ) : (
           <div className="space-y-4">
-            {usersWithNoRoles.map(u => (
+            {usersPendingApproval.map(u => (
               <div key={u.user_id} className="flex justify-between items-center p-4 border rounded-lg">
                 <div>
                   <h3 className="font-medium">{u.name || u.email}</h3>
                   <p className="text-sm text-gray-600">{u.email}</p>
-                  <p className="text-sm text-gray-500">Roles: None</p>
+                  <p className="text-sm text-gray-500">Roles: {u.roles.length ? u.roles.join(', ') : 'None'}</p>
                 </div>
                 <button
                   onClick={() => assignAdmin(u.user_id)}
