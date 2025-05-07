@@ -3,18 +3,19 @@ import {
   BrowserRouter as Router, 
   Routes, 
   Route, 
-  Navigate
+  Navigate 
 } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+
+import RoleRedirect from "./pages/RoleRedirect";
 import AdminPage from "./pages/AdminPage";
 import SuperAdminPage from "./pages/SuperAdminPage";
 import SearchPage from "./pages/SearchPage";
 import Navbar from "./components/Navbar";
 import APIDocumentation from "./pages/APIDocumentation";
 import PrivateRoute from "./components/PrivateRoute";
-import Login from "./pages/Login";  // Make sure this matches your file name
+import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
-import PendingApproval from './pages/PendingApproval';
+import PendingApproval from "./pages/PendingApproval";
 
 function App() {
   return (
@@ -23,16 +24,18 @@ function App() {
         <Navbar />
         <div className="flex-1 w-full">
           <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<HomePage />} />
+
+            {/* 👇 Redirects based on role after login */}
+            <Route path="/" element={<RoleRedirect />} />
+
+            {/* Public */}
             <Route path="/search" element={<SearchPage />} />
             <Route path="/api-docs" element={<APIDocumentation />} />
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
 
-            
-            {/* Protected routes - Admin */}
+            {/* Protected: Admin */}
             <Route
               path="/admin"
               element={
@@ -41,8 +44,8 @@ function App() {
                 </PrivateRoute>
               }
             />
-            
-            {/* Protected routes - Super Admin */}
+
+            {/* Protected: Super Admin */}
             <Route
               path="/super-admin"
               element={
@@ -51,8 +54,8 @@ function App() {
                 </PrivateRoute>
               }
             />
-            
-            {/* Fallback route */}
+
+            {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
