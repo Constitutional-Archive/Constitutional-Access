@@ -6,7 +6,7 @@ import {
   Navigate 
 } from "react-router-dom";
 
-import RoleRedirect from "./pages/RoleRedirect";
+import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
 import SuperAdminPage from "./pages/SuperAdminPage";
 import SearchPage from "./pages/SearchPage";
@@ -26,7 +26,7 @@ function App() {
           <Routes>
 
             {/* 👇 Redirects based on role after login */}
-            <Route path="/" element={<RoleRedirect />} />
+            <Route path="/" element={<HomePage />} />
 
             {/* Public */}
             <Route path="/search" element={<SearchPage />} />
