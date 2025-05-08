@@ -1,21 +1,30 @@
-const express = require('express');
-const app = express();
-const cors = require('cors');
-const bodyParser = require('body-parser');
 require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const authRoutes = require('./routes/auth0');
 
-// ✅ Import your Auth0 routes
-const auth0Routes = require('./routes/auth0');
+const app = express();
 
-// ✅ Middlewares
-app.use(cors());
-app.use(bodyParser.json());
+// ✅ Production CORS config
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
 
-// ✅ Mount the auth0 API routes
-app.use('/api/auth0', auth0Routes);
+app.use(cors(corsOptions));
+app.use(express.json());
 
-// ✅ Start the server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+// ✅ Mount routes
+app.use('/api/auth0', authRoutes);
+
+// ✅ Global error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
 });
+
+// ✅ Start server
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
