@@ -92,6 +92,7 @@ router.get('/users-with-roles', async (req, res) => {
         });
       }
     }
+    
 
     res.json(enrichedUsers);
   } catch (err) {
