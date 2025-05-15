@@ -1,22 +1,16 @@
+
+require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const fileRoutes = require('./routes/files');
-require('dotenv').config(); // ✅ Load environment variables
+const authRoutes = require('./routes/auth0'); // ✅ we only need this
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
 
-// ✅ Use the .env MongoDB connection string
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => console.log('✅ MongoDB connected successfully'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+app.use('/api/auth0', authRoutes); // ✅ this handles all user + role routes
 
-app.use('/api/files', fileRoutes);
-
-app.listen(5000, () => {
-  console.log('🚀 Server running at http://localhost:5000');
-});
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

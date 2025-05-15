@@ -1,0 +1,61 @@
+name: Azure Static Web Apps CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - develop
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: false
+          
+      - name: Install Dependencies and Build
+        run: |
+          npm install
+          npm run build  # This assumes your React app is in the root directory
+
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_FLOWER_0A4BFD703 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          action: "upload"
+          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
+          app_location: "/"  # Since the frontend is in the root directory
+          api_location: ""  # Empty because the backend is a separate app
+          output_location: "build"  # Built app content directory (created after `npm run build`)
+          ###### End of Repository/Build Configurations ######
+        env:
+          REACT_APP_AUTH0_DOMAIN: ${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+          REACT_APP_AUTH0_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
+          REACT_APP_SEARCH_BACKEND_URL: ${{ secrets.REACT_APP_SEARCH_BACKEND_URL }}
+          REACT_APP_BACKEND_URL: ${{ secrets.REACT_APP_BACKEND_URL }} 
+          REACT_APP_AUTH0_AUDIENCE: ${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+          REACT_APP_AUTH0_SCOPE: ${{ secrets.REACT_APP_AUTH0_SCOPE }}
+          SKIP_PREFLIGHT_CHECK: ${{ secrets.SKIP_PREFLIGHT_CHECK }}
+          REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
+          ROLES_NAMESPACE: ${{ secrets.ROLES_NAMESPACE }}
+
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request Job
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_FLOWER_0A4BFD703 }}
+          action: "close"
