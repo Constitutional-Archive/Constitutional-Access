@@ -292,8 +292,8 @@ const FileUpload = ({ onFileSelect }) => {
 
                     <div>
                       <label htmlFor={`tags-${index}`} className="block text-sm font-medium text-slate-700 mb-1">
-                        Tags <span className="text-rose-500">*</span> 
-                        <em className="text-slate-400 text-xs ml-2">(comma separated)</em>
+                        Publication Date <span className="text-rose-500">*</span> 
+                        <em className="text-slate-400 text-xs ml-2">(date of release)</em>
                       </label>
                       <input
                         id={`tags-${index}`}
