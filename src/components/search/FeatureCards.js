@@ -1,68 +1,93 @@
 const React = require('react');
+const { useState } = require('react');
+const { ChevronRight, Download, FileText } = require('lucide-react');
 
-const FeatureCards = () => {
-  const features = [
-    {
-      icon: React.createElement('svg', {
-        className: 'w-6 h-6 text-blue-600',
-        fill: 'none',
-        stroke: 'currentColor',
-        viewBox: '0 0 24 24'
-      }, React.createElement('path', {
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round',
-        strokeWidth: 2,
-        d: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z'
-      })),
-      title: "Understand Your Query",
-      description: "We parse and analyze your input intelligently to deliver precise answers.",
-      bgColor: "bg-blue-100"
-    },
-    {
-      icon: React.createElement('svg', {
-        className: 'w-6 h-6 text-green-600',
-        fill: 'none',
-        stroke: 'currentColor',
-        viewBox: '0 0 24 24'
-      }, React.createElement('path', {
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round',
-        strokeWidth: 2,
-        d: 'M5 13l4 4L19 7'
-      })),
-      title: "Get Reliable Results",
-      description: "Our engine uses curated sources to provide trustworthy, referenced answers.",
-      bgColor: "bg-green-100"
-    },
-    {
-      icon: React.createElement('svg', {
-        className: 'w-6 h-6 text-purple-600',
-        fill: 'none',
-        stroke: 'currentColor',
-        viewBox: '0 0 24 24'
-      }, React.createElement('path', {
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round',
-        strokeWidth: 2,
-        d: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z'
-      })),
-      title: "Interact Naturally",
-      description: "Chat in natural language—no tech jargon needed.",
-      bgColor: "bg-purple-100"
-    }
-  ];
+const ResultCard = ({ result }) => {
+  const [showChat, setShowChat] = useState(false);
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState([]);
 
-  return React.createElement('div', { className: 'grid md:grid-cols-3 gap-8 mb-16' },
-    features.map((feature, index) =>
-      React.createElement('div', { key: index, className: 'bg-white p-6 rounded-xl shadow-sm border border-gray-100' },
-        React.createElement('div', { className: `${feature.bgColor} w-12 h-12 rounded-full flex items-center justify-center mb-4` },
-          feature.icon
+  const title = result.title || result.name || 'Untitled';
+  const excerpt = result.excerpt || result.summary || 'No summary available.';
+  const relevance = result.relevance || result.score || 'N/A';
+  const type = result.type || result.filetype || 'Unknown';
+  const fileUrl = result.fileUrl;
+
+  const handleSend = async () => {
+    const userMessage = { role: 'user', content: input };
+    const response = await fetch('/api/chat-with-doc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: result.fullText || result.excerpt || '',  // Replace with full doc if available
+        history: [...messages, userMessage],
+      })
+    });
+    const data = await response.json();
+    const botMessage = { role: 'assistant', content: data.reply };
+
+    setMessages([...messages, userMessage, botMessage]);
+    setInput('');
+  };
+
+  return React.createElement('div', {
+    className: 'bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow'
+  },
+    React.createElement('div', { className: 'flex items-start space-x-4' },
+      React.createElement('div', { className: 'flex-shrink-0 mt-1 text-gray-400' },
+        React.createElement(FileText, { className: 'w-6 h-6' })
+      ),
+      React.createElement('div', { className: 'flex-1' },
+        React.createElement('div', { className: 'flex justify-between items-start' },
+          React.createElement('div', null,
+            React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, title),
+            React.createElement('p', { className: 'mt-2 text-gray-600' }, excerpt)
+          ),
+          React.createElement('span', {
+            className: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
+          }, `Relevance: ${relevance}`)
         ),
-        React.createElement('h3', { className: 'text-xl font-semibold mb-2' }, feature.title),
-        React.createElement('p', { className: 'text-gray-600' }, feature.description)
+        React.createElement('div', { className: 'mt-4 flex items-center space-x-6' },
+          React.createElement('span', { className: 'inline-flex items-center text-sm text-gray-500' }, type),
+          React.createElement('a', {
+            href: fileUrl,
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            className: 'inline-flex items-center text-sm text-blue-600 hover:text-blue-800'
+          }, 'View ', React.createElement(ChevronRight, { className: 'h-4 w-4 ml-1' })),
+          React.createElement('a', {
+            href: fileUrl,
+            download: true,
+            className: 'inline-flex items-center text-sm text-blue-600 hover:text-blue-800'
+          }, 'Download ', React.createElement(Download, { className: 'h-4 w-4 ml-1' })),
+          React.createElement('button', {
+            className: 'text-sm text-indigo-600 hover:text-indigo-800',
+            onClick: () => setShowChat(!showChat)
+          }, showChat ? 'Close Chat' : '💬 Chat')
+        ),
+        showChat && React.createElement('div', { className: 'mt-4 p-3 border rounded bg-gray-50 space-y-2' },
+          messages.map((msg, i) => (
+            React.createElement('div', {
+              key: i,
+              className: msg.role === 'user' ? 'text-right text-blue-700' : 'text-left text-gray-700'
+            }, React.createElement('p', null, msg.content))
+          )),
+          React.createElement('div', { className: 'flex space-x-2 mt-2' },
+            React.createElement('input', {
+              value: input,
+              onChange: e => setInput(e.target.value),
+              placeholder: 'Ask something...',
+              className: 'flex-1 border px-2 py-1 rounded'
+            }),
+            React.createElement('button', {
+              onClick: handleSend,
+              className: 'bg-indigo-600 text-white px-3 py-1 rounded'
+            }, 'Send')
+          )
+        )
       )
     )
   );
 };
 
-module.exports = FeatureCards;
+module.exports = ResultCard;
