@@ -1,4 +1,5 @@
 import React from "react";
+
 import { 
   BrowserRouter as Router, 
   Routes, 
@@ -17,6 +18,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
 import PendingApproval from "./pages/PendingApproval";
+import uploadpage from './pages/uploadpage';
 
 function App() {
   return (
@@ -35,6 +37,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
+            <Route path="/uploaded-files" element={<uploadpage />} />
 
             {/* Protected: Admin */}
             <Route

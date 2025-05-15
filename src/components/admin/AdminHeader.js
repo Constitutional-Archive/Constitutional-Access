@@ -16,9 +16,9 @@ const AdminHeader = () => {
   const adminNavItems = [
     { 
       name: 'File Upload', 
-      path: '/admin', 
+      path: '/uploaded-files', 
       icon: <FileText className="h-5 w-5" />,
-      current: location.pathname === '/super-admin'
+      current: location.pathname === '/uploaded-files'
     },
     { 
       name: 'Admin', 
