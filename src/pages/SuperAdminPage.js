@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import { Shield, Users, CheckCircle2, XCircle } from 'lucide-react';
+import { Shield, Users, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
 const SuperAdminPage = () => {
   const { user } = useAuth0();
@@ -9,43 +9,44 @@ const SuperAdminPage = () => {
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState({});
+
+  const API_BASE = 'http://localhost:5001';
 
   // ✅ Fetch users with roles
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
+    setLoading(true); // Ensure UI resets properly
     try {
-      const res = await axios.get('http://localhost:5001/api/auth0/users-with-roles');
+      const res = await axios.get(`${API_BASE}/api/auth0/users-with-roles`);
       setUsers(res.data);
-      setLoading(false);
     } catch (err) {
       console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // ✅ Reusable handler for assign/revoke
+  const updateUserRoles = async (userId, endpoint) => {
+    setActionLoading((prev) => ({ ...prev, [userId]: true }));
+    try {
+      await axios.post(`${API_BASE}/api/auth0/${endpoint}`, { userId });
+      await new Promise((res) => setTimeout(res, 300)); // Optional delay for smoother update
+      await fetchUsers();
+    } catch (err) {
+      console.error(`Error on ${endpoint}:`, err);
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [userId]: false }));
     }
   };
 
-  // ✅ Assign admin role
-  const assignAdmin = async (userId) => {
-    try {
-      await axios.post('http://localhost:5001/api/auth0/assign-admin', { userId });
-      fetchUsers();
-    } catch (err) {
-      console.error('Error assigning admin role:', err);
-    }
-  };
-
-  // ✅ Revoke admin role
-  const revokeAdmin = async (userId) => {
-    try {
-      await axios.post('http://localhost:5001/api/auth0/revoke-admin', { userId });
-      fetchUsers();
-    } catch (err) {
-      console.error('Error revoking admin role:', err);
-    }
-  };
+  const assignAdmin = (userId) => updateUserRoles(userId, 'assign-admin');
+  const revokeAdmin = (userId) => updateUserRoles(userId, 'revoke-admin');
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
-  // ✅ Authorization check
   if (!roles.includes('superadmin')) {
     return (
       <div className="p-8 text-center">
@@ -55,9 +56,16 @@ const SuperAdminPage = () => {
     );
   }
 
-  // ✅ Role filters
-  const usersWithNoRoles = users.filter(u => u.roles.length === 0);
-  const usersWithAdminRole = users.filter(u => u.roles.includes('admin'));
+  const normalizeRoles = (roleArray) =>
+    roleArray.map(r => (typeof r === 'string' ? r : r?.name)).filter(Boolean);
+
+  const usersWithAdminRole = users.filter(u =>
+    normalizeRoles(u.roles).includes('admin')
+  );
+
+  const usersPendingApproval = users.filter(u =>
+    !normalizeRoles(u.roles).includes('admin')
+  );
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -66,32 +74,37 @@ const SuperAdminPage = () => {
         <h1 className="text-2xl font-bold">User Role Manager</h1>
       </header>
 
-      {/* New Users */}
+      {/* Pending Approval Users */}
       <section className="bg-white rounded-lg shadow p-6 mb-10">
         <h2 className="text-lg font-semibold mb-4 flex items-center">
           <Users className="h-5 w-5 text-yellow-500 mr-2" />
-          New Users (No Roles Assigned) ({usersWithNoRoles.length})
+          Pending Approval ({usersPendingApproval.length})
         </h2>
         {loading ? (
           <p className="text-gray-500">Loading users...</p>
         ) : (
           <div className="space-y-4">
-            {usersWithNoRoles.map(u => (
-              <div key={u.user_id} className="flex justify-between items-center p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">{u.name || u.email}</h3>
-                  <p className="text-sm text-gray-600">{u.email}</p>
-                  <p className="text-sm text-gray-500">Roles: None</p>
+            {usersPendingApproval.map(u => {
+              const roleList = normalizeRoles(u.roles);
+              const isLoading = actionLoading[u.user_id];
+              return (
+                <div key={u.user_id} className="flex justify-between items-center p-4 border rounded-lg">
+                  <div>
+                    <h3 className="font-medium">{u.name || u.email}</h3>
+                    <p className="text-sm text-gray-600">{u.email}</p>
+                    <p className="text-sm text-gray-500">Roles: {roleList.length ? roleList.join(', ') : 'None'}</p>
+                  </div>
+                  <button
+                    onClick={() => assignAdmin(u.user_id)}
+                    className="p-2 text-green-600 hover:bg-green-50 rounded-full disabled:opacity-50"
+                    disabled={isLoading}
+                    title="Assign Admin"
+                  >
+                    {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <CheckCircle2 className="h-5 w-5" />}
+                  </button>
                 </div>
-                <button
-                  onClick={() => assignAdmin(u.user_id)}
-                  className="p-2 text-green-600 hover:bg-green-50 rounded-full"
-                  title="Assign Admin"
-                >
-                  <CheckCircle2 className="h-5 w-5" />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
@@ -106,22 +119,27 @@ const SuperAdminPage = () => {
           <p className="text-gray-500">Loading users...</p>
         ) : (
           <div className="space-y-4">
-            {usersWithAdminRole.map(u => (
-              <div key={u.user_id} className="flex justify-between items-center p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">{u.name || u.email}</h3>
-                  <p className="text-sm text-gray-600">{u.email}</p>
-                  <p className="text-sm text-gray-500">Roles: {u.roles.join(', ')}</p>
+            {usersWithAdminRole.map(u => {
+              const roleList = normalizeRoles(u.roles);
+              const isLoading = actionLoading[u.user_id];
+              return (
+                <div key={u.user_id} className="flex justify-between items-center p-4 border rounded-lg">
+                  <div>
+                    <h3 className="font-medium">{u.name || u.email}</h3>
+                    <p className="text-sm text-gray-600">{u.email}</p>
+                    <p className="text-sm text-gray-500">Roles: {roleList.join(', ')}</p>
+                  </div>
+                  <button
+                    onClick={() => revokeAdmin(u.user_id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-full disabled:opacity-50"
+                    disabled={isLoading}
+                    title="Revoke Admin"
+                  >
+                    {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <XCircle className="h-5 w-5" />}
+                  </button>
                 </div>
-                <button
-                  onClick={() => revokeAdmin(u.user_id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-                  title="Revoke Admin"
-                >
-                  <XCircle className="h-5 w-5" />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

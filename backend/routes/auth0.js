@@ -12,10 +12,19 @@ const {
   ADMIN_ROLE_ID,
 } = process.env;
 
+// 🔐 Auth0 Management API token caching
 let managementToken = null;
 let tokenExpiry = 0;
 
-// 🔐 Helper: Get Management API token and cache it
+// 🔧 Initialize Auth0 ManagementClient
+const management = new ManagementClient({
+  domain: AUTH0_DOMAIN,
+  clientId: AUTH0_CLIENT_ID,
+  clientSecret: AUTH0_CLIENT_SECRET,
+  scope: 'read:users update:users read:roles delete:roles',
+});
+
+// 🔐 Helper: Get Management API token (for axios calls)
 async function getManagementToken() {
   const now = Math.floor(Date.now() / 1000);
   if (managementToken && tokenExpiry > now) return managementToken;
@@ -28,7 +37,7 @@ async function getManagementToken() {
   });
 
   managementToken = response.data.access_token;
-  tokenExpiry = now + response.data.expires_in - 60; // 1-minute buffer
+  tokenExpiry = now + response.data.expires_in - 60;
   return managementToken;
 }
 
@@ -46,24 +55,22 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// ✅ GET: Users with their roles (with delay to avoid rate limits)
+// ✅ GET: Users with their roles
 router.get('/users-with-roles', async (req, res) => {
   try {
     const token = await getManagementToken();
-
     const usersRes = await axios.get(`https://${AUTH0_DOMAIN}/api/v2/users`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const users = usersRes.data;
 
+    const users = usersRes.data;
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     const enrichedUsers = [];
 
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
-
       try {
-        await delay(300); // Delay to avoid 429s
+        await delay(300);
         const rolesRes = await axios.get(
           `https://${AUTH0_DOMAIN}/api/v2/users/${user.user_id}/roles`,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -73,7 +80,7 @@ router.get('/users-with-roles', async (req, res) => {
           user_id: user.user_id,
           name: user.name,
           email: user.email,
-          roles: rolesRes.data.map(role => role.name),
+       roles: rolesRes.data.map(role => role.name),
         });
       } catch (roleErr) {
         console.error(`Failed to get roles for ${user.email}`, roleErr.response?.data || roleErr.message);
@@ -85,6 +92,7 @@ router.get('/users-with-roles', async (req, res) => {
         });
       }
     }
+    
 
     res.json(enrichedUsers);
   } catch (err) {
@@ -115,41 +123,40 @@ router.post('/assign-admin', async (req, res) => {
   }
 });
 
-// ✅ POST: Revoke admin role (using axios, correct format)
+// ✅ POST: Revoke admin role
 router.post('/revoke-admin', async (req, res) => {
   const { userId } = req.body;
 
-  if (!userId) {
-    return res.status(400).json({ error: 'Missing userId' });
-  }
-
   try {
-    const token = await getManagementToken();
+    if (!userId) {
+      console.error('❌ Missing userId in request body');
+      return res.status(400).json({ message: 'Missing userId' });
+    }
 
-    console.log("Trying to revoke role from user:", userId);
-    console.log("Using role ID:", ADMIN_ROLE_ID);
+    // Get all roles to find 'admin'
+    const roles = await management.getRoles();
+    console.log('✅ Available roles:', roles.map(r => ({ id: r.id, name: r.name })));
 
-    await axios.request({
-      method: 'delete',
-      url: `https://${AUTH0_DOMAIN}/api/v2/roles/${ADMIN_ROLE_ID}/users`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      data: {
-        users: [userId]
-      }
-    });
+    const adminRole = roles.find(role => role.name.toLowerCase() === 'admin');
+    if (!adminRole) {
+      console.error('❌ Admin role not found');
+      return res.status(404).json({ message: 'Admin role not found' });
+    }
 
+    console.log(`🚨 Removing role ${adminRole.id} from user ${userId}`);
+
+    await management.removeRolesFromUser(
+      { id: userId },
+      { roles: [adminRole.id] }
+    );
+
+    console.log('✅ Role removed successfull');
     res.status(200).json({ message: 'Admin role revoked successfully' });
-  } catch (err) {
-    console.error('Revoke admin failed:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Failed to revoke admin role' });
+
+  } catch (error) {
+    console.error('❌ Error revoking admin role:', error.message, error.stack);
+    res.status(500).json({ message: 'Failed to revoke admin role' });
   }
 });
-
-
-
-
 
 module.exports = router;
