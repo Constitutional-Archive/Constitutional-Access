@@ -6,22 +6,39 @@ const encode = str => encodeURIComponent(str);
 
 router.get("/", async (req, res) => {
   try {
-    const { q, category } = req.query;
+    const { q, category, fileType } = req.query;
     const query = {};
 
-    // Text search
+    // Text and year-based search
     if (q && q.trim() !== "") {
       const searchRegex = { $regex: q, $options: "i" };
-      query.$or = [
-        { fileName: searchRegex },
-        { description: searchRegex },
-        { uploadedBy: searchRegex }
-      ];
+
+      // If q is a 4-digit year
+      const yearMatch = q.match(/^\d{4}$/);
+      if (yearMatch) {
+        const year = parseInt(q, 10);
+        const startOfYear = new Date(year, 0, 1);  // January 1
+        const startOfNextYear = new Date(year + 1, 0, 1);  // January 1 next year
+
+        query.publicationDate = {
+          $gte: startOfYear,
+          $lt: startOfNextYear
+        };
+      } else {
+        // Text-based search
+        query.$or = [
+          { fileName: searchRegex },
+          { description: searchRegex }
+        ];
+      }
     }
 
     // Category filter
     if (category && category.trim() !== "") {
       query.category = category;
+    }
+    if (fileType && fileType.trim() !== "") {
+      query.fileType = { $regex: fileType, $options: "i" };
     }
 
     console.log("Executing query:", query);
@@ -31,25 +48,22 @@ router.get("/", async (req, res) => {
     const formattedResults = results.map(doc => {
       const fileUrl = doc.fileUrl;
 
-      // Validate fileUrl
       if (
         !fileUrl ||
         typeof fileUrl !== "string" ||
-        fileUrl.includes("http") || // avoid full URLs
+        fileUrl.includes("http") ||
         fileUrl.includes("undefined")
       ) {
         console.log("Invalid fileUrl:", fileUrl);
         return null;
       }
 
-      console.log("Found fileUrl:", fileUrl);
-      const encodedPath = encode(fileUrl);
-
       return {
         id: doc._id,
         title: doc.fileName || "Untitled",
         excerpt: doc.description || "No description available",
         type: doc.category || "Unknown",
+        publicationDate: doc.publicationDate,
         relevance: `${Math.floor(Math.random() * 21) + 80}%`,
         fileUrl: `${process.env.REACT_APP_SEARCH_BACKEND_URL}/api/search/download?path=${encodeURIComponent(doc.fileUrl)}`,
         uploadedAt: doc.uploadedAt,

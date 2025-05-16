@@ -5,13 +5,14 @@ import SearchResults from '../components/search/SearchResults';
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedFileType, setSelectedFileType] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSearch = async () => {
-    if (!searchQuery.trim() && !selectedCategory) {
+    if (!searchQuery.trim() && !selectedCategory && !selectedFileType) {
       setResults([]);
       setHasSearched(false);
       return;
@@ -25,7 +26,7 @@ const SearchPage = () => {
       const query = new URLSearchParams();
       if (searchQuery.trim()) query.append('q', searchQuery.trim());
       if (selectedCategory) query.append('category', selectedCategory);
-
+      if (selectedFileType) query.append('fileType', selectedFileType);
       const response = await fetch(`${process.env.REACT_APP_SEARCH_BACKEND_URL}/api/search?${query.toString()}`);
       if (!response.ok) throw new Error('Search failed');
       const data = await response.json();
@@ -60,7 +61,15 @@ const SearchPage = () => {
       {error && <p className="text-center text-red-500 mt-4">{error}</p>}
 
       {hasSearched && !loading && !error && (
-        <SearchResults results={results} searchQuery={searchQuery} />
+        <SearchResults
+        results={results}
+        searchQuery={searchQuery}
+        selectedFileType={selectedFileType}
+        onFileTypeChange={(newType) => {
+          setSelectedFileType(newType);
+          handleSearch();
+        }}
+      />
       )}
     </div>
   );

@@ -50,7 +50,8 @@ export const useFileManagement = () => {
       formData.append('files', file);
       formData.append('category', metadata.category);  
       formData.append('description', metadata.description || '');
-      formData.append('tags', JSON.stringify(metadata.tags || []));
+      formData.append('fileType', metadata.fileType || '');
+      formData.append('publicationDate', metadata.publicationDate || '');
       formData.append('uploadedBy', metadata.uploadedBy || '');
       
       const uploadUrl = `${API_URL}/upload?category=${encodeURIComponent(metadata.category)}`;
@@ -75,16 +76,15 @@ export const useFileManagement = () => {
   
   const handleMetadataUpload = async (metadata, fileUrl, file) => {
     const metadataPayload = {
-      ...metadata,
-       
       fileName: file.name,
       fileSize: file.size,
-      fileType: file.type,
+      fileType: metadata.fileType,
       category: metadata.category,
-      fileUrl: fileUrl
+      description: metadata.description || '',
+      uploadedBy: metadata.uploadedBy || '',
+      publicationDate: metadata.publicationDate || null,
+      fileUrl: fileUrl,
     };
-  
-    console.log("Sending metadata:", metadataPayload); 
   
     try {
       const metadataRes = await fetch(`${API_URL}/upload/metadata`, {
@@ -99,12 +99,11 @@ export const useFileManagement = () => {
   
       const metadataData = await metadataRes.json();
       console.log('Metadata upload complete:', metadataData);
-  
     } catch (error) {
       console.error('Metadata upload error:', error);
     }
-
   };
+  
 
   const handleFileEdit = (id) => {
     const fileToEdit = files.find(file => file.id === id);

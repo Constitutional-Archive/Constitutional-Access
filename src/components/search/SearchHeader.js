@@ -1,7 +1,7 @@
 const React = require('react');
 const { Search } = require('lucide-react');
 
-const SearchHeader = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory, handleSearch, handleKeyDown }) => {
+const SearchHeader = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory,selectedFileType, setSelectedFileType, handleSearch, handleKeyDown }) => {
   const categories = [
     { label: "Constitution", value: "constitution" },
     { label: "Amendment", value: "amendment" },

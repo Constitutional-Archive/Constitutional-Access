@@ -6,7 +6,8 @@ const EditMetadataModal = ({ file, onClose, onSave }) => {
     name: '',
     category: '',
     description: '',
-    tags: '',
+    publicationDate: '',
+    fileType: '',
     path: '/'
   });
 
@@ -16,7 +17,8 @@ const EditMetadataModal = ({ file, onClose, onSave }) => {
         name: file.name || '',
         category: file.category || '',
         description: file.description || '',
-        tags: file.tags?.join(', ') || '',
+        publicationDate: file.publicationDate || '',
+        fileType: file.fileType || '',
         path: file.path || '/'
       });
     }
@@ -31,7 +33,8 @@ const EditMetadataModal = ({ file, onClose, onSave }) => {
       name: metadata.name,
       category: metadata.category,
       description: metadata.description,
-      tags: metadata.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+      publicationDate: metadata.publicationDate,
+      fileType: metadata.fileType,
       path: metadata.path
     });
   };
@@ -73,6 +76,21 @@ const EditMetadataModal = ({ file, onClose, onSave }) => {
                 <option value="legal">Legal Analysis</option>
               </select>
             </label>
+            <label className="block">
+              <p className="text-sm font-medium text-gray-700">FileType*</p>
+              <select
+                value={metadata.fileType}
+                onChange={(e) => setMetadata({...metadata, fileType: e.target.value})}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              >
+                <option value="">Select fileType</option>
+                <option value="article">Article</option>
+                <option value="audio">Audio</option>
+                <option value="video">Video</option>
+                <option value="image">Image</option>
+              </select>
+            </label>
 
             <label className="block">
               <p className="text-sm font-medium text-gray-700">Directory Path</p>
@@ -96,15 +114,16 @@ const EditMetadataModal = ({ file, onClose, onSave }) => {
             </label>
 
             <label className="block">
-              <p className="text-sm font-medium text-gray-700">Tags (comma-separated)</p>
+              <p className="text-sm font-medium text-gray-700">Publication Date*</p>
               <input
-                type="text"
-                value={metadata.tags}
-                onChange={(e) => setMetadata({...metadata, tags: e.target.value})}
+                type="date"
+                value={metadata.publicationDate}
+                onChange={(e) => setMetadata({ ...metadata, publicationDate: e.target.value })}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="constitution, amendment, historical"
+                required
               />
             </label>
+
           </fieldset>
           <footer className="mt-6 flex justify-end space-x-3">
             <button
