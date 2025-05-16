@@ -11,6 +11,7 @@ import RoleRedirect from "./pages/RoleRedirect";
 import AdminPage from "./pages/AdminPage";
 import SuperAdminPage from "./pages/SuperAdminPage";
 import SearchPage from "./pages/SearchPage";
+import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
 import APIDocumentation from "./pages/APIDocumentation";
 import PrivateRoute from "./components/PrivateRoute";
@@ -27,7 +28,8 @@ function App() {
           <Routes>
 
             {/* 👇 Redirects based on role after login */}
-            <Route path="/" element={<RoleRedirect />} />
+           <Route path="/" element={<HomePage />} />
+<Route path="/redirect" element={<RoleRedirect />} />
 
             {/* Public */}
             <Route path="/search" element={<SearchPage />} />

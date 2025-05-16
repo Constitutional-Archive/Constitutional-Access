@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const semanticSearch = require('./routes/semanticSearch');
 
 const uploadRoutes = require("./routes/uploadRoutes");
 const searchRoutes = require("./routes/search");
@@ -44,7 +45,7 @@ if (process.env.NODE_ENV !== 'test') {
 app.use("/api", uploadRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/chat", chatRoutes);
-
+app.use('/api', semanticSearch);
 
 // Export app for server and testing
 module.exports = app;

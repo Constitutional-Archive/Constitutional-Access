@@ -1,53 +1,46 @@
-import { useState } from 'react';
+// --- SearchPage.js ---
+import React, { useState } from 'react';
 import SearchHeader from '../components/search/SearchHeader';
 import SearchResults from '../components/search/SearchResults';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async () => {
-    if (!searchQuery.trim() && !selectedCategory) {
-      setResults([]);
-      setHasSearched(false);
-      return;
-    }
-
+    if (!searchQuery.trim()) return;
     setLoading(true);
     setHasSearched(true);
-    setError(null);
-
+    setResults([]);
     try {
-      const query = new URLSearchParams();
-      if (searchQuery.trim()) query.append('q', searchQuery.trim());
-      if (selectedCategory) query.append('category', selectedCategory);
-
-      const response = await fetch(`${process.env.REACT_APP_SEARCH_BACKEND_URL}/api/search?${query.toString()}`);
-      if (!response.ok) throw new Error('Search failed');
-      const data = await response.json();
-      setResults(data);
+      const endpoint = `${process.env.REACT_APP_SEARCH_BACKEND_URL || 'http://localhost:5000'}/api/semantic-search?query=${encodeURIComponent(searchQuery)}`;
+      const res = await fetch(endpoint);
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Non-OK response:', text);
+        throw new Error(`Invalid response type. Got: ${text.slice(0, 100)}`);
+      }
+      const data = await res.json();
+      console.log("🔍 Results:", data);
+      setResults(data || []);
     } catch (err) {
-      console.error('Search failed:', err);
-      setError('Something went wrong while searching.');
-      setResults([]);
+      console.error('Search error:', err);
+      alert('❌ Failed to fetch search results. Make sure the backend is running and returning valid JSON.\n\n' + err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
+    if (e.key === 'Enter') handleSearch();
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <SearchHeader 
+    <div className="min-h-screen px-4 py-8 bg-gray-50">
+      <SearchHeader
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedCategory={selectedCategory}
@@ -55,12 +48,10 @@ const SearchPage = () => {
         handleSearch={handleSearch}
         handleKeyDown={handleKeyDown}
       />
-
-      {loading && <p className="text-center text-gray-500 mt-4">Searching...</p>}
-      {error && <p className="text-center text-red-500 mt-4">{error}</p>}
-
-      {hasSearched && !loading && !error && (
-        <SearchResults results={results} searchQuery={searchQuery} />
+      {loading ? (
+        <div className="text-center text-gray-600 mt-12 text-lg animate-pulse">🔍 Searching documents...</div>
+      ) : (
+        <SearchResults searchQuery={searchQuery} results={results} hasSearched={hasSearched} />
       )}
     </div>
   );
