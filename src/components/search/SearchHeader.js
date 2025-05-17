@@ -1,12 +1,29 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 
-const SearchHeader = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory, handleSearch, handleKeyDown }) => {
-  const categories = [
-    { label: "Constitution", value: "constitution" },
-    { label: "Amendment", value: "amendment" },
-    { label: "Legal Documents", value: "legal" }
-  ];
+const categories = [
+  { label: "Constitution", value: "constitution" },
+  { label: "Amendment", value: "amendment" },
+  { label: "Legal", value: "legal" },
+  { label: "Bill", value: "bill" },
+  { label: "Acts", value: "acts" },
+];
+
+const SearchHeader = ({
+  searchQuery,
+  setSearchQuery,
+  selectedCategories,
+  setSelectedCategories,
+  handleSearch,
+  handleKeyDown
+}) => {
+  const toggleCategory = (value) => {
+    setSelectedCategories((prev) =>
+      prev.includes(value)
+        ? prev.filter((v) => v !== value)
+        : [...prev, value]
+    );
+  };
 
   return (
     <div className="text-center mb-16">
@@ -29,19 +46,15 @@ const SearchHeader = ({ searchQuery, setSearchQuery, selectedCategory, setSelect
         </button>
       </div>
 
-      <div className="mt-6 flex justify-center gap-6">
+      <div className="mt-6 flex justify-center gap-4 flex-wrap">
         {categories.map((cat) => (
-          <label key={cat.value} className="inline-flex items-center text-gray-700 text-lg">
+          <label key={cat.value} className="inline-flex items-center text-gray-700 text-sm">
             <input
-              type="radio"
-              name="docType"
+              type="checkbox"
               value={cat.value}
-              className="form-radio h-5 w-5 text-blue-600"
-              checked={selectedCategory === cat.value}
-              onChange={() => {
-                const newCategory = selectedCategory === cat.value ? '' : cat.value;
-                setSelectedCategory(newCategory);
-              }}
+              checked={selectedCategories.includes(cat.value)}
+              onChange={() => toggleCategory(cat.value)}
+              className="form-checkbox h-4 w-4 text-blue-600"
             />
             <span className="ml-2">{cat.label}</span>
           </label>
