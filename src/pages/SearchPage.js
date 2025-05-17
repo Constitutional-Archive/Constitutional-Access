@@ -36,11 +36,11 @@ const SearchPage = () => {
   };
 
   // ✅ Re-trigger search only when filter/category changes after an initial search
-  useEffect(() => {
-    if (hasSearched) {
-      handleSearch();
-    }
-  }, [filter, selectedCategories]); // intentionally exclude searchQuery!
+   useEffect(() => {
+  if (hasSearched) {
+    handleSearch();
+  }
+}, [handleSearch, hasSearched, filter, selectedCategories]); // ✅ ESLint satisfied
 
   return (
     <div className="min-h-screen px-4 py-8 bg-gray-50">
