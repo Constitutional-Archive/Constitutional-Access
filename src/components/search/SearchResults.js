@@ -1,12 +1,17 @@
-
-// --- SearchResults.js ---
 import React from 'react';
 import { Filter } from 'lucide-react';
 import ResultCard from './ResultCard';
 
-const SearchResults = ({ searchQuery, results, hasSearched }) => {
+const SearchResults = ({ searchQuery, results, hasSearched, aiAnswer, filter, setFilter }) => {
   return (
     <div className="max-w-4xl mx-auto mt-10">
+      {aiAnswer && (
+        <div className="mb-8 p-5 bg-blue-50 border border-blue-200 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">AI Answer</h3>
+          <p className="text-blue-800 whitespace-pre-wrap">{aiAnswer}</p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold text-gray-900">
           {results.length > 0 && `Results for "${searchQuery}"`}
@@ -16,12 +21,16 @@ const SearchResults = ({ searchQuery, results, hasSearched }) => {
             <Filter className="h-4 w-4 mr-1" />
             Filters:
           </span>
-          <select className="border rounded-lg px-3 py-1.5 text-gray-600 bg-white shadow-sm">
-            <option>All Types</option>
-            <option>Articles (documentation)</option>
-            <option>Audio</option>
-            <option>Video</option>
-            <option>Image</option>
+          <select
+            className="border rounded-lg px-3 py-1.5 text-gray-600 bg-white shadow-sm"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="all">All Types</option>
+            <option value="pdf">Articles (PDF)</option>
+            <option value="image">Image</option>
+            <option value="audio">Audio</option>
+            <option value="video">Video</option>
           </select>
         </div>
       </div>
