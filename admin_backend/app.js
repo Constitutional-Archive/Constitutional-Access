@@ -3,9 +3,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const semanticSearch = require('./routes/semanticSearch');
 
 const uploadRoutes = require("./routes/uploadRoutes");
 const searchRoutes = require("./routes/search");
+const chatRoutes = require('./routes/chat');
+
 
 const app = express();
 
@@ -26,6 +29,8 @@ app.use(cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
+
+
 // Connect to MongoDB (only outside of test mode)
 if (process.env.NODE_ENV !== 'test') {
   mongoose.connect(process.env.MONGO_URL, {
@@ -39,6 +44,8 @@ if (process.env.NODE_ENV !== 'test') {
 // Routes
 app.use("/api", uploadRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/chat", chatRoutes);
+app.use('/api', semanticSearch);
 
 // Export app for server and testing
 module.exports = app;

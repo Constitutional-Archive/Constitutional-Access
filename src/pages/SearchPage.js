@@ -1,66 +1,70 @@
-import { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SearchHeader from '../components/search/SearchHeader';
 import SearchResults from '../components/search/SearchResults';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState([]);
+  const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [filter, setFilter] = useState('all');
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim() && !selectedCategory) {
-      setResults([]);
-      setHasSearched(false);
-      return;
-    }
-
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery.trim()) return;
     setLoading(true);
     setHasSearched(true);
-    setError(null);
-
+    setResults([]);
     try {
-      const query = new URLSearchParams();
-      if (searchQuery.trim()) query.append('q', searchQuery.trim());
-      if (selectedCategory) query.append('category', selectedCategory);
-
-      const response = await fetch(`${process.env.REACT_APP_SEARCH_BACKEND_URL}/api/search?${query.toString()}`);
-      if (!response.ok) throw new Error('Search failed');
-      const data = await response.json();
-      setResults(data);
+      const backendUrl = process.env.REACT_APP_SEARCH_BACKEND_URL || 'http://localhost:5000';
+      const categoryParam = selectedCategories.join(',');
+      const endpoint = `${backendUrl}/api/semantic-search?query=${encodeURIComponent(searchQuery)}&filter=${filter}&categories=${categoryParam}`;
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      setResults(data.results || []);
+      setAnswer(data.answer || '');
     } catch (err) {
-      console.error('Search failed:', err);
-      setError('Something went wrong while searching.');
-      setResults([]);
+      alert('Search failed: ' + err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, filter, selectedCategories]);
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
+    if (e.key === 'Enter') handleSearch();
   };
 
+  // ✅ Re-trigger search only when filter/category changes after an initial search
+  useEffect(() => {
+    if (hasSearched) {
+      handleSearch();
+    }
+  }, [filter, selectedCategories]); // intentionally exclude searchQuery!
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <SearchHeader 
+    <div className="min-h-screen px-4 py-8 bg-gray-50">
+      <SearchHeader
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
         handleSearch={handleSearch}
         handleKeyDown={handleKeyDown}
       />
-
-      {loading && <p className="text-center text-gray-500 mt-4">Searching...</p>}
-      {error && <p className="text-center text-red-500 mt-4">{error}</p>}
-
-      {hasSearched && !loading && !error && (
-        <SearchResults results={results} searchQuery={searchQuery} />
+      {loading ? (
+        <div className="text-center text-gray-600 mt-12 text-lg animate-pulse">
+          🔍 Searching documents...
+        </div>
+      ) : (
+        <SearchResults
+          searchQuery={searchQuery}
+          results={results}
+          hasSearched={hasSearched}
+          aiAnswer={answer}
+          filter={filter}
+          setFilter={setFilter}
+        />
       )}
     </div>
   );
