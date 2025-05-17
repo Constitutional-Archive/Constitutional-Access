@@ -37,3 +37,27 @@ describe('Search API', () => {
     expect(res.body[0]).toHaveProperty('title', 'Mock File');
   });
 });
+
+describe('Download route', () => {
+  it('redirects to Azure blob URL when path is provided', async () => {
+    process.env.ACCOUNT_NAME = 'fakeaccount';
+    process.env.CONTAINER_NAME = 'fakecontainer';
+    process.env.SAS_TOKEN = 'fakeSASToken';
+
+    const testPath = 'some/file.pdf';
+    const encodedPath = encodeURIComponent(testPath);
+
+    const res = await request(app).get(`/api/search/download?path=${encodedPath}`);
+
+    expect(res.statusCode).toBe(302);
+    expect(res.headers.location).toBe(
+      `https://fakeaccount.blob.core.windows.net/fakecontainer/${testPath}?fakeSASToken`
+    );
+  });
+
+  it('returns 400 if no path is provided', async () => {
+    const res = await request(app).get('/api/search/download');
+    expect(res.statusCode).toBe(400);
+    expect(res.text).toBe('Missing file path.');
+  });
+});
