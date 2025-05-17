@@ -25,11 +25,15 @@ const ResultCard = ({ result }) => {
     setInput('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/chat/chat-with-doc', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileUrl, history: [...messages, userMessage] }),
-      });
+  const response = await fetch(
+    `${process.env.REACT_APP_SEARCH_BACKEND_URL || 'http://localhost:5000'}/api/chat/chat-with-doc`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fileUrl, history: [...messages, userMessage] }),
+    }
+  );
+
 
       const data = await response.json();
       const botMessage = { role: 'assistant', content: data.reply };
