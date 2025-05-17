@@ -124,3 +124,4 @@ const ResultCard = ({ result }) => {
 };
 
 export default ResultCard;
+
