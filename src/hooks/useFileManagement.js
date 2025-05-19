@@ -47,10 +47,10 @@ export const useFileManagement = () => {
       const { file, metadata } = item;
   
       const formData = new FormData();
-      formData.append('files', file);
-      formData.append('category', metadata.category);  
+      formData.append('files', file); 
       formData.append('description', metadata.description || '');
-      formData.append('tags', JSON.stringify(metadata.tags || []));
+      formData.append('fileType', metadata.fileType || '');
+      formData.append('publicationDate', metadata.publicationDate || '');
       formData.append('uploadedBy', metadata.uploadedBy || '');
       
       const uploadUrl = `${API_URL}/upload?category=${encodeURIComponent(metadata.category)}`;
@@ -79,8 +79,11 @@ export const useFileManagement = () => {
        
       fileName: file.name,
       fileSize: file.size,
-      fileType: file.type,
+      fileType: metadata.fileType,
       category: metadata.category,
+      description: metadata.description || '',
+      uploadedBy: metadata.uploadedBy || '',
+      publicationDate: metadata.publicationDate || null,
       fileUrl: fileUrl
     };
   
