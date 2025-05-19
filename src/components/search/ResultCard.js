@@ -115,20 +115,21 @@ const ResultCard = ({ result }) => {
 
               {/* Chat Input */}
               <div className="flex space-x-2">
-                <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask something..."
-                  className="flex-1 border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={isLoading}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm disabled:opacity-50"
-                >
-                  {isLoading ? '...' : 'Send'}
-                </button>
-              </div>
+  <input
+    value={input}
+    onChange={(e) => setInput(e.target.value)}
+    placeholder="Ask AI a question related to this document..."
+    className="flex-1 min-w-0 border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+  />
+  <button
+    onClick={handleSend}
+    disabled={isLoading}
+    className="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm disabled:opacity-50"
+  >
+    {isLoading ? '...' : 'Send'}
+  </button>
+</div>
+
             </div>
           )}
         </div>
