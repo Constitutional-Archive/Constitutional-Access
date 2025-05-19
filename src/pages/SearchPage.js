@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import SearchHeader from '../components/search/SearchHeader';
 import SearchResults from '../components/search/SearchResults';
+import { Loader2 } from 'lucide-react';
 
 const SearchPage = () => {
+
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [answer, setAnswer] = useState('');
