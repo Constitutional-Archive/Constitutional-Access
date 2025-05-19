@@ -5,10 +5,12 @@ import FileUpload from '../components/admin/FileUpload';
 import FileTable from '../components/admin/FileTable';
 import EditMetadataModal from '../components/admin/EditMetadataModal';
 import { useFileManagement } from '../hooks/useFileManagement';
+import { useEffect } from 'react';
 
 const AdminPage = () => {
   const navigate = useNavigate();
   const {
+    fetchFiles,
     files,
     selectedFile,
     handleFileUpload,
@@ -17,6 +19,10 @@ const AdminPage = () => {
     handleMetadataUpdate,
     setSelectedFile,
   } = useFileManagement();
+
+  useEffect(() => {
+    fetchFiles();
+  }, [fetchFiles]);
 
   const handleSignOut = () => {
     // Mock implementation - in real app, this would call an auth service

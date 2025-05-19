@@ -11,7 +11,7 @@ const SuperAdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState({});
 
-  const API_BASE = 'http://localhost:5001';
+  const API_BASE = process.env.REACT_APP_API_BASE_URL;
 
   // ✅ Fetch users with roles
   const fetchUsers = useCallback(async () => {
@@ -24,7 +24,7 @@ const SuperAdminPage = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [API_BASE]);
 
   // ✅ Reusable handler for assign/revoke
   const updateUserRoles = async (userId, endpoint) => {
@@ -47,7 +47,7 @@ const SuperAdminPage = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  if (!roles.includes('superadmin')) {
+  if (!roles.includes('super_admin')) {
     return (
       <div className="p-8 text-center">
         <h2 className="text-2xl font-bold text-red-600">Unauthorized Access</h2>

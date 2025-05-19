@@ -1,120 +1,100 @@
 import { useState } from 'react';
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+import { useAuth0 } from '@auth0/auth0-react';
+
+const API_URL = process.env.REACT_APP_SEARCH_BACKEND_URL;
+console.log('API_URL:', API_URL);
 
 export const useFileManagement = () => {
-  // Mock data for demonstration
-  const initialFiles = [
-    {
-      id: 1,
-      name: 'Constitution_1947.pdf',
-      type: 'PDF',
-      size: '2.4 MB',
-      date: '2024-03-15',
-      category: 'constitution',
-      description: 'Original Constitution document from 1947',
-      tags: ['constitution', 'original', 'historical'],
-      path: '/constitution/original'
-    },
-    {
-      id: 2,
-      name: 'Amendments_2020.docx',
-      type: 'Document',
-      size: '1.1 MB',
-      date: '2024-03-14',
-      category: 'amendment',
-      description: 'Recent constitutional amendments from 2020',
-      tags: ['amendment', 'recent'],
-      path: '/constitution/amendments'
-    },
-    {
-      id: 3,
-      name: 'Historical_Notes.pdf',
-      type: 'PDF',
-      size: '3.7 MB',
-      date: '2024-03-13',
-      category: 'historical',
-      description: 'Historical notes and analysis',
-      tags: ['historical', 'analysis'],
-      path: '/historical/notes'
-    },
-  ];
-
-  const [files, setFiles] = useState(initialFiles);
+  const { user } = useAuth0();
+  const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleFileUpload = async (fileObjects) => {
+  // Fetch user's files on mount
+  const fetchFiles = async () => {
+    try {
+      const userEmail = user.email;
+
+      const response = await fetch(`${API_URL}/api/files`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      setFiles(data);
+    } catch (err) {
+      console.error('Failed to fetch user files:', err);
+    }
+  };
+
+   const handleFileUpload = async (fileObjects) => {
     for (const item of fileObjects) {
       const { file, metadata } = item;
-  
+
       const formData = new FormData();
       formData.append('files', file);
-      formData.append('category', metadata.category);  
-      formData.append('description', metadata.description || '');
-      formData.append('tags', JSON.stringify(metadata.tags || []));
-      formData.append('uploadedBy', metadata.uploadedBy || '');
-      
-      const uploadUrl = `${API_URL}/upload?category=${encodeURIComponent(metadata.category)}`;
 
+      const uploadUrl = `${API_URL}/api/upload?category=${metadata.category}`;
 
       try {
+        // 1. Upload file to Azure Blob Storage via backend
         const uploadRes = await fetch(uploadUrl, {
           method: 'POST',
           body: formData,
+          credentials: 'include',
         });
-  
+
         const uploadData = await uploadRes.json();
-        const uploadedFile = uploadData.files[0];
-  
-        await handleMetadataUpload(metadata, uploadedFile.blobName, file);
+        const uploadedFileUrl = uploadData.fileUrls[0];
+
+        // 2. Upload metadata
+        await handleMetadataUpload(metadata, uploadedFileUrl, file);
+
       } catch (error) {
         console.error('Upload error:', error);
       }
     }
   };
-  
-  
+
   const handleMetadataUpload = async (metadata, fileUrl, file) => {
     const metadataPayload = {
-      ...metadata,
-       
       fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      category: metadata.category,
-      fileUrl: fileUrl
+      description: metadata.description || '',
+      category: metadata.category || '',
+      tags: metadata.tags || [],
+      fileUrl: fileUrl,
+      uploadedBy: user.email || '', // Auth0 user ID
     };
-  
-    console.log("Sending metadata:", metadataPayload); 
-  
+
     try {
-      const metadataRes = await fetch(`${API_URL}/upload/metadata`, {
+      const res = await fetch(`${API_URL}/api/upload/metadata`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(metadataPayload),
+        credentials: 'include',
       });
-  
-      if (!metadataRes.ok) {
-        throw new Error('Metadata upload failed');
-      }
-  
-      const metadataData = await metadataRes.json();
-      console.log('Metadata upload complete:', metadataData);
-  
+
+      const newMetadata = await res.json();
+
+      // Add new file to state
+      setFiles(prev => [newMetadata.metadata, ...prev]);
+
     } catch (error) {
       console.error('Metadata upload error:', error);
     }
-
   };
 
   const handleFileEdit = (id) => {
-    const fileToEdit = files.find(file => file.id === id);
-    if (fileToEdit) {
-      setSelectedFile(fileToEdit);
-    }
-  };
-
-  const handleFileDelete = (id) => {
-    setFiles(files.filter(file => file.id !== id));
+    const fileToEdit = files.find(file => file._id === id);
+    if (fileToEdit) setSelectedFile(fileToEdit);
   };
 
   const handleMetadataUpdate = (id, metadata) => {
@@ -124,13 +104,66 @@ export const useFileManagement = () => {
     setSelectedFile(null);
   };
 
+  const handleFileMetadataUpdate = async (id, newMetadata) => {
+    try {
+      const res = await fetch(`${API_URL}/api/files/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newMetadata),
+        credentials: 'include',
+      });
+
+      const updated = await res.json();
+    
+      setFiles(files.map(file => (file._id === id ? updated.metadata : file)));
+      setSelectedFile(null);
+    } catch (err) {
+      console.error('Metadata update failed:', err);
+    }
+  };
+
+  const handleFileDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this file?");
+    if (!confirmDelete) return;
+
+    console.log('Deleting file with ID:', id);
+
+    try {
+      const res = await fetch(`${API_URL}/api/files/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          id,
+          email: user.email, // assuming you're getting `user` from auth context or props
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to delete file');
+      }
+
+      setFiles((prevFiles) => prevFiles.filter((file) => file._id !== id));
+      alert('File deleted successfully');
+    } catch (err) {
+      console.error('Error deleting file:', err);
+      alert('Error deleting file: ' + err.message);
+    }
+  };
+
+
   return {
+    fetchFiles,
     files,
     selectedFile,
     handleFileUpload,
     handleFileEdit,
-    handleFileDelete,
     handleMetadataUpdate,
+    handleFileMetadataUpdate,
+    handleFileDelete,
     setSelectedFile,
   };
 };

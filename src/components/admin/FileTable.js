@@ -18,12 +18,12 @@ const FileTable = ({ files, onEdit, onDelete }) => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {files.map((file) => (
-            <tr key={file.id}>
+            <tr key={file._id}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <figure className="flex items-center">
                   <FolderTree className="h-5 w-5 text-gray-400 mr-2" />
                   <figcaption>
-                    <p className="text-sm font-medium text-gray-900">{file.name}</p>
+                    <p className="text-sm font-medium text-gray-900">{file.fileName}</p>
                     {file.tags && (
                       <p className="text-sm text-gray-500">
                         {file.tags.map((tag, index) => (
@@ -36,21 +36,21 @@ const FileTable = ({ files, onEdit, onDelete }) => {
                   </figcaption>
                 </figure>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.type}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.fileType}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.category || '-'}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.path || '/'}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.size}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.date}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.fileUrl || '/'}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.fileSize}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.uploadedAt}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button 
                   className="text-blue-600 hover:text-blue-900 mr-3"
-                  onClick={() => onEdit(file.id)}
+                  onClick={() => onEdit(file._id)}
                 >
                   <Edit className="h-4 w-4" />
                 </button>
                 <button 
                   className="text-red-600 hover:text-red-900"
-                  onClick={() => onDelete(file.id)}
+                  onClick={() => onDelete(file._id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

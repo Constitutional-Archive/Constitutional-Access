@@ -3,8 +3,20 @@ import { Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const hasRequiredRole = (userRoles, requiredRoles) => {
-  if (userRoles.includes('superadmin')) return true;
-  return requiredRoles.some(role => userRoles.includes(role));
+  // Always allow super_admins
+  if (userRoles.includes('super_admin')) return true;
+
+  for (let i = 0; i < requiredRoles.length; i++) {
+    const required = requiredRoles[i];
+    for (let j = 0; j < userRoles.length; j++) {
+      const role = userRoles[j];
+      if (role === required) {
+        console.log(`User has required role: ${role}`);
+        return true;
+      }
+    }
+  }
+  return false;
 };
 
 const PrivateRoute = ({ children, requiredRoles = [] }) => {
@@ -19,12 +31,15 @@ const PrivateRoute = ({ children, requiredRoles = [] }) => {
   // Debug: Log roles
   console.log('User roles:', userRoles);
 
-  const isNewUser = userRoles.length === 0 || (userRoles.length === 1 && userRoles.includes('new_user'));
+  const isNewUser = userRoles.length === 0 || (userRoles.length === 1 && userRoles.includes('default_user'));
   if (isNewUser) {
     return <Navigate to="/pending-approval" replace />;
   }
 
-  const hasRole = requiredRoles.length === 0 || hasRequiredRole(userRoles, requiredRoles);
+  console.log('Required roles:', requiredRoles);
+
+  const hasRole = hasRequiredRole(userRoles, requiredRoles);
+
 
   if (!hasRole) {
     return <Navigate to="/unauthorized" replace />;

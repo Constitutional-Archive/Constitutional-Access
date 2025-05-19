@@ -6,7 +6,6 @@ const ResultCard = ({ result }) => {
   const [showChat, setShowChat] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
-
   const title = result.title || result.name || 'Untitled';
   const excerpt = result.excerpt || result.summary || 'No summary available.';
   const relevance = result.relevance || result.score || 'N/A';
@@ -76,7 +75,7 @@ const ResultCard = ({ result }) => {
             React.createElement('input', {
               value: input,
               onChange: e => setInput(e.target.value),
-              placeholder: 'Ask AI a question related to this document...',
+              placeholder: 'Ask something...',
               className: 'flex-1 border px-2 py-1 rounded'
             }),
             React.createElement('button', {

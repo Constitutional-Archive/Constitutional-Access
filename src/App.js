@@ -9,16 +9,15 @@ import {
 
 import RoleRedirect from "./pages/RoleRedirect";
 import AdminPage from "./pages/AdminPage";
+import HomePage from "./pages/HomePage";
 import SuperAdminPage from "./pages/SuperAdminPage";
 import SearchPage from "./pages/SearchPage";
-import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
 import APIDocumentation from "./pages/APIDocumentation";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
 import PendingApproval from "./pages/PendingApproval";
-import UploadPage from "./pages/UploadPage";
 
 function App() {
   return (
@@ -29,13 +28,13 @@ function App() {
           <Routes>
 
             {/* 👇 Redirects based on role after login */}
-           <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/redirect" element={<RoleRedirect />} />
 
             {/* Public */}
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/api-docs" element={<APIDocumentation />} />
-            <Route path="/uploaded-files" element={<UploadPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
@@ -44,7 +43,7 @@ function App() {
             <Route
               path="/admin"
               element={
-                <PrivateRoute requiredRoles={['admin', 'superadmin']}>
+                <PrivateRoute requiredRoles={['admin', 'super_admin']}>
                   <AdminPage />
                 </PrivateRoute>
               }
@@ -54,7 +53,7 @@ function App() {
             <Route
               path="/super-admin"
               element={
-                <PrivateRoute requiredRoles={['superadmin']}>
+                <PrivateRoute requiredRoles={['super_admin']}>
                   <SuperAdminPage />
                 </PrivateRoute>
               }
