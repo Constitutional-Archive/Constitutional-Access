@@ -18,6 +18,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
 import PendingApproval from "./pages/PendingApproval";
+import UploadPage from "./pages/UploadPage";
 
 function App() {
   return (
@@ -29,11 +30,12 @@ function App() {
 
             {/* 👇 Redirects based on role after login */}
            <Route path="/" element={<HomePage />} />
-<Route path="/redirect" element={<RoleRedirect />} />
+            <Route path="/redirect" element={<RoleRedirect />} />
 
             {/* Public */}
             <Route path="/search" element={<SearchPage />} />
             <Route path="/api-docs" element={<APIDocumentation />} />
+            <Route path="/uploaded-files" element={<UploadPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
