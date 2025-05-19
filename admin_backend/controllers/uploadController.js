@@ -20,7 +20,7 @@ exports.uploadFiles = (req, res) => {
 exports.uploadMetadata = async (req, res) => {
   console.log("POST /upload/metadata hit");
   try {
-    const { fileName, description, category, uploadedBy, tags, fileUrl } = req.body;
+    const { fileName, description, category, uploadedBy, publicationDate, fileType, fileUrl } = req.body;
 
     if (!fileUrl || fileUrl.length === 0) {
       return res.status(400).json({ message: "No file URL provided" });
@@ -31,7 +31,8 @@ exports.uploadMetadata = async (req, res) => {
       description,
       category,
       uploadedBy,
-      tags,
+      publicationDate,
+      fileType,
       fileUrl,
       uploadedAt: new Date(),
     });
