@@ -76,7 +76,7 @@ const ResultCard = ({ result }) => {
             React.createElement('input', {
               value: input,
               onChange: e => setInput(e.target.value),
-              placeholder: 'Ask something...',
+              placeholder: 'Ask AI a question related to this document...',
               className: 'flex-1 border px-2 py-1 rounded'
             }),
             React.createElement('button', {
