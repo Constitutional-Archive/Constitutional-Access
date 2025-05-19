@@ -73,7 +73,8 @@ const FileUpload = ({ onFileSelect }) => {
           name: file.name,
           category: '',
           description: '',
-          tags: []
+          fileType: '',
+          publicationDate: ''
         },
         isValid: false
       }));
@@ -90,7 +91,8 @@ const FileUpload = ({ onFileSelect }) => {
           name: file.name,
           category: '',
           description: '',
-          tags: []
+          fileType: '',
+          publicationDate: ''
         },
         isValid: false
       }));
@@ -107,7 +109,8 @@ const FileUpload = ({ onFileSelect }) => {
       fileData.metadata.name.trim() !== '' &&
       fileData.metadata.category.trim() !== '' &&
       fileData.metadata.description.trim() !== '' &&
-      fileData.metadata.tags.length > 0
+      fileData.metadata.fileType.trim() !== '' &&
+      fileData.metadata.publicationDate.trim() !== ''
     );
   };
 
@@ -271,7 +274,28 @@ const FileUpload = ({ onFileSelect }) => {
                           <option value="">Select category</option>
                           <option value="constitution">Constitution</option>
                           <option value="amendment">Amendment</option>
-                          <option value="legal">Legal Document</option>
+                          <option value="legal">Legal</option>
+                          <option value="Bill">Bill</option>
+                          <option value="Acts">Acts</option>
+                        </select>
+                      </div>
+
+                       <div>
+                        <label htmlFor={`fileType-${index}`} className="block text-sm font-medium text-slate-700 mb-1">
+                          FileType <span className="text-rose-500">*</span>
+                        </label>
+                        <select
+                          id={`fileType-${index}`}
+                          value={item.metadata.fileType}
+                          onChange={(e) => handleMetadataChange(index, 'fileType', e.target.value)}
+                          className="block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2.5"
+                          required
+                        >
+                          <option value="">Select fileType</option>
+                          <option value="article">Article</option>
+                          <option value="audio">Audio</option>
+                          <option value="video">Video</option>
+                          <option value="image">Image</option>
                         </select>
                       </div>
                     </fieldset>
@@ -292,14 +316,14 @@ const FileUpload = ({ onFileSelect }) => {
 
                     <div>
                       <label htmlFor={`tags-${index}`} className="block text-sm font-medium text-slate-700 mb-1">
-                        Tags <span className="text-rose-500">*</span> 
-                        <em className="text-slate-400 text-xs ml-2">(comma separated)</em>
+                        Publication Date <span className="text-rose-500">*</span> 
+                        <em className="text-slate-400 text-xs ml-2">(date of release)</em>
                       </label>
                       <input
-                        id={`tags-${index}`}
-                        type="text"
-                        value={item.metadata.tags.join(', ')}
-                        onChange={(e) => handleMetadataChange(index, 'tags', e.target.value.split(',').map(t => t.trim()))}
+                        id={`publicationDate-${index}`}
+                        type="date"
+                        value={item.metadata.publicationDate || ''}
+                        onChange={(e) => handleMetadataChange(index, 'publicationDate', e.target.value)}
                         className="block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2.5"
                         required
                       />
