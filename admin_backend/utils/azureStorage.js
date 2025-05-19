@@ -8,6 +8,10 @@ const azureStorage = new MulterAzureStorage({
   blobName: (req, file) => {
     return new Promise((resolve, reject) => {
       const category = req.query.category;
+
+      console.log("Category received in multer:", category);
+
+
       const blobName = `${category}/${Date.now()}-${file.originalname}`;
       resolve(blobName);
     });
