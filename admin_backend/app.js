@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const semanticSearch = require('./routes/semanticSearch');
+const fileRoutes = require("./routes/files");
 
 const uploadRoutes = require("./routes/uploadRoutes");
 const searchRoutes = require("./routes/search");
@@ -25,7 +26,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
@@ -46,6 +46,8 @@ app.use("/api", uploadRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/chat", chatRoutes);
 app.use('/api', semanticSearch);
+app.use("/api/files", fileRoutes);
+
 
 // Export app for server and testing
 module.exports = app;
