@@ -64,7 +64,7 @@ const EditMetadataModal = ({ file, onClose, onSave }) => {
                 <option value="constitution">Constitution</option>
                 <option value="amendment">Amendment</option>
                 <option value="Bill">Bill</option>
-                <option value="Rights">Rights</option>
+                <option value="Acts">Acts</option>
                 <option value="legal">Legal</option>
               </select>
             </label>
