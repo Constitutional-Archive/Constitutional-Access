@@ -1,0 +1,18 @@
+# pack-refs with: peeled fully-peeled sorted 
+cdae8708dfa0acbdeb4632442771b8563557ba54 refs/heads/develop
+f2ec705272dcefe0b3589c7022d2b83ad72e5c78 refs/heads/master
+f2ec705272dcefe0b3589c7022d2b83ad72e5c78 refs/remotes/origin/HEAD
+acf66f4d8057c4bb466969f9543e011f9ee04d4b refs/remotes/origin/Kwanele
+73b277860ca5f411bd3d2ea73003c0f7f6d36c63 refs/remotes/origin/Moloko
+06cd378ade924157a43e8062d19c26967ada24f4 refs/remotes/origin/Naledi
+d19d5640273697173adc737ec4b30f47a2cef371 refs/remotes/origin/Ntokozo
+34fe265a11ec6275eb7a4c8627e06a8084fea13c refs/remotes/origin/backend
+1108332df087be559debe7498f245516f868d04f refs/remotes/origin/connect-backend
+cdae8708dfa0acbdeb4632442771b8563557ba54 refs/remotes/origin/develop
+7ce7d855d38e4db3f2022f2df37d392c0b3a3a1d refs/remotes/origin/kwanele
+a4d9de83ae494ad73823fd07bc985b925ac8575f refs/remotes/origin/login-feature
+f2ec705272dcefe0b3589c7022d2b83ad72e5c78 refs/remotes/origin/master
+918512c090b39a48780132179fa44bdbf4668f35 refs/remotes/origin/revert-57-develop
+f28a11d5cbd4cd52f70ce29e33104788c331531c refs/remotes/origin/risuna
+b085917f61bd92195edbf0f77f90bc9b6de75cb1 refs/remotes/origin/search-backend
+c9621866c6f6e16bf4a60dc2c50c762971df0264 refs/tags/v1.0.0

@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/f4392b81-0a4d-45df-a487-e2b54ffbee0c/resourceGroups/GitHub/providers/Microsoft.Web/sites/searchBack",
+    "appService.deploySubpath": "admin_backend"
+}
