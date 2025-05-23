@@ -90,10 +90,11 @@ cd constitutional-access
 # Install dependencies
 npm install
 
-# Set up environment variables
+# Set up environment variables by creating an .env file
 type .env # On Windows
+# ---------- Or ---------------
 touch .env # On Linux
-# Edit .env with Azure Blob credentials, OpenAI key, etc.
+# Then dit .env with Azure Blob credentials, OpenAI key, etc.
 
 # Run locally
 npm start
