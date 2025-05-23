@@ -94,7 +94,7 @@ npm install
 type .env # On Windows
 # ---------- Or ---------------
 touch .env # On Linux
-# Then dit .env with Azure Blob credentials, OpenAI key, etc.
+# Then edit .env with Azure Blob credentials, OpenAI key, etc.
 
 # Run locally
 npm start
