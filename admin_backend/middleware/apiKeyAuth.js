@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const allowedOrigins = [
-  'https://salmon-pond-060a97a10.6.azurestaticapps.net',
+  'https://happy-wave-077d83310.6.azurestaticapps.net',
   'http://localhost:3000',
 ];
 

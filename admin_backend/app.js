@@ -18,7 +18,7 @@ const app = express();
 // CORS setup
 const corsOptions = {
   origin: [
-    'https://salmon-pond-060a97a10.6.azurestaticapps.net', // deployed frontend URL
+    'https://happy-wave-077d83310.6.azurestaticapps.net', // deployed frontend URL
     'http://localhost:3000', // local frontend URL for development
     'https://searchback-guhvgzbmdkcudvf4.canadacentral-01.azurewebsites.net', // deployed backend URL
   ],
