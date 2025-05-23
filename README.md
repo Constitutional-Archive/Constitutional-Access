@@ -84,14 +84,15 @@ The project follows **Agile methodology**, **test-driven development (TDD)**, an
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/constitutional-archive-search.git
-cd constitutional-archive-search
+git clone https://github.com/constitutional-archive/constitutional-access.git
+cd constitutional-access
 
 # Install dependencies
 npm install
 
 # Set up environment variables
-cp .env.example .env
+type .env # On Windows
+touch .env # On Linux
 # Edit .env with Azure Blob credentials, OpenAI key, etc.
 
 # Run locally
