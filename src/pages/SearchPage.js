@@ -12,13 +12,11 @@ const SearchPage = () => {
   const [filter, setFilter] = useState('all');
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-  // Store latest query in ref for filter/category changes
   const searchQueryRef = useRef(searchQuery);
   useEffect(() => {
     searchQueryRef.current = searchQuery;
   }, [searchQuery]);
 
-  // Stable search function
   const handleSearch = useCallback(async (query) => {
     if (!query.trim()) return;
     setLoading(true);
@@ -45,40 +43,47 @@ const SearchPage = () => {
     }
   };
 
-  // Re-run search if filter/category changes after initial search
   useEffect(() => {
     if (hasSearched) {
       handleSearch(searchQueryRef.current);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, selectedCategories, hasSearched]);
+  }, [filter, selectedCategories, hasSearched, handleSearch]);
+  
 
   return (
-    <div className="min-h-screen px-4 py-8 bg-gray-50">
-      <SearchHeader
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedCategories={selectedCategories}
-        setSelectedCategories={setSelectedCategories}
-        handleSearch={() => handleSearch(searchQuery)}
-        handleKeyDown={handleKeyDown}
-      />
+    <main className="min-h-screen px-4 py-8 bg-gray-50">
+      <header>
+        <SearchHeader
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategories={selectedCategories}
+          setSelectedCategories={setSelectedCategories}
+          handleSearch={() => handleSearch(searchQuery)}
+          handleKeyDown={handleKeyDown}
+        />
+      </header>
+
       {loading ? (
-        <div className="flex flex-col items-center justify-center mt-16 text-gray-600">
+        <section
+          className="flex flex-col items-center justify-center mt-16 text-gray-600"
+          aria-label="Loading search results"
+        >
           <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
           <p className="mt-4 text-sm text-gray-500">Searching documents...</p>
-        </div>
+        </section>
       ) : (
-        <SearchResults
-          searchQuery={searchQuery}
-          results={results}
-          hasSearched={hasSearched}
-          aiAnswer={answer}
-          filter={filter}
-          setFilter={setFilter}
-        />
+        <section aria-label="Search results">
+          <SearchResults
+            searchQuery={searchQuery}
+            results={results}
+            hasSearched={hasSearched}
+            aiAnswer={answer}
+            filter={filter}
+            setFilter={setFilter}
+          />
+        </section>
       )}
-    </div>
+    </main>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import { Mail } from 'lucide-react';
 
 const ContactPage = () => {
@@ -19,27 +18,19 @@ const ContactPage = () => {
           <p className="mt-2 text-gray-600">
             For general questions about the project or platform, feel free to email us at student_number@students.wits.ac.za.
           </p>
-          <div className="mt-4 flex flex-wrap items-center text-gray-700 gap-4">
-            <Mail className="h-5 w-5 text-blue-500" />
-            <a href="mailto:2663553@students.wits.ac.za" className="underline">
+          <ul className="mt-4 flex flex-wrap items-center text-gray-700 gap-4 list-none">
+            <li className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-blue-500" />
+              <a href="mailto:2663553@students.wits.ac.za" className="underline">
                 2663553
-            </a>
-            <a href="mailto:2709514@students.wits.ac.za" className="underline">
-                2709514
-            </a>
-            <a href="mailto:2673228@students.wits.ac.za" className="underline">
-                2673228
-            </a>
-            <a href="mailto:2684883@students.wits.ac.za" className="underline">
-                2684883
-            </a>
-            <a href="mailto:2440810@students.wits.ac.za" className="underline">
-                2440810
-            </a>
-            <a href="mailto:2684367@students.wits.ac.za" className="underline">
-                2684367
-            </a>
-          </div>
+              </a>
+            </li>
+            <li><a href="mailto:2709514@students.wits.ac.za" className="underline">2709514</a></li>
+            <li><a href="mailto:2673228@students.wits.ac.za" className="underline">2673228</a></li>
+            <li><a href="mailto:2684883@students.wits.ac.za" className="underline">2684883</a></li>
+            <li><a href="mailto:2440810@students.wits.ac.za" className="underline">2440810</a></li>
+            <li><a href="mailto:2684367@students.wits.ac.za" className="underline">2684367</a></li>
+          </ul>
         </article>
 
         <section className="p-6">

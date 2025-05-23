@@ -12,9 +12,9 @@ const FeatureCard = ({ iconSrc, alt, title, description, onClick }) => (
     transition={{ duration: 0.5 }}
   >
     <header className="flex items-center space-x-4">
-      <div className="p-3 bg-blue-100 rounded-full shadow-lg transform rotate-3">
+      <figure className="p-3 bg-blue-100 rounded-full shadow-lg transform rotate-3">
         <img src={iconSrc} alt={alt} className="h-10 w-10 object-contain" />
-      </div>
+      </figure>
       <h2 className="text-xl font-semibold">{title}</h2>
     </header>
     <p className="text-sm text-gray-700">{description}</p>
@@ -52,13 +52,16 @@ const HomePage = () => {
         >
           Consti Find
         </motion.h1>
-        <motion.img
-          src="/massort- contifind.png"
-          alt="Mascot"
-          className="w-64"
+        <motion.figure
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-        />
+        >
+          <img
+            src="/massort- contifind.png"
+            alt="Mascot"
+            className="w-64"
+          />
+        </motion.figure>
       </section>
 
       {/* Right Section - Feature Cards */}

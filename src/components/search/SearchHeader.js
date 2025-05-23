@@ -26,10 +26,24 @@ const SearchHeader = ({
   };
 
   return (
-    <div className="text-center mb-16">
-      <h1 className="text-4xl font-bold text-gray-900 mb-6">What do you want to search?</h1>
-      <div className="max-w-2xl mx-auto relative">
+    <section className="text-center mb-16" aria-labelledby="search-title">
+      <header>
+        <h1 id="search-title" className="text-4xl font-bold text-gray-900 mb-6">
+          What do you want to search?
+        </h1>
+      </header>
+
+      <form
+        className="max-w-2xl mx-auto relative"
+        role="search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSearch();
+        }}
+      >
+        <label htmlFor="search-input" className="sr-only">Search input</label>
         <input
+          id="search-input"
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -39,16 +53,24 @@ const SearchHeader = ({
           autoFocus
         />
         <button
-          onClick={handleSearch}
+          type="submit"
           className="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 focus:outline-none"
+          aria-label="Search"
         >
           <Search className="h-6 w-6" />
         </button>
-      </div>
+      </form>
 
-      <div className="mt-6 flex justify-center gap-4 flex-wrap">
+      <fieldset
+        className="mt-6 flex justify-center gap-4 flex-wrap"
+        aria-label="Filter categories"
+      >
+        <legend className="sr-only">Categories</legend>
         {categories.map((cat) => (
-          <label key={cat.value} className="inline-flex items-center text-gray-700 text-sm">
+          <label
+            key={cat.value}
+            className="inline-flex items-center text-gray-700 text-sm"
+          >
             <input
               type="checkbox"
               value={cat.value}
@@ -56,11 +78,13 @@ const SearchHeader = ({
               onChange={() => toggleCategory(cat.value)}
               className="form-checkbox h-4 w-4 text-blue-600"
             />
-            <span className="ml-2">{cat.label}</span>
+            <abbr title={cat.label} className="ml-2 not-italic">
+              {cat.label}
+            </abbr>
           </label>
         ))}
-      </div>
-    </div>
+      </fieldset>
+    </section>
   );
 };
 

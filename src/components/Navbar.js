@@ -8,69 +8,82 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
-  const linkClasses = (path) =>
+  const isActive = (path) => location.pathname === path;
+
+  const navLinkClass = (path) =>
     `flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-      location.pathname === path
-        ? 'bg-blue-600 text-white'
-        : 'text-gray-700 hover:bg-gray-200'
+      isActive(path) ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-200'
     }`;
 
-  const mobileLinkClasses = (path) =>
+  const mobileLinkClass = (path) =>
     `block px-3 py-2 rounded-md text-base font-medium ${
-      location.pathname === path
-        ? 'bg-blue-600 text-white'
-        : 'text-gray-700 hover:bg-gray-200'
+      isActive(path) ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-200'
     }`;
 
   return (
-    <nav className="bg-white border-b border-gray-200 shadow-sm w-full">
-      <header className="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between mx-auto w-full">
+    <nav className="bg-white border-b border-gray-200 shadow-sm w-full" aria-label="Main site navigation">
+      <header className="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between w-full">
         <h1 className="text-xl font-bold text-gray-800">Constitution Archive</h1>
 
-        <div className="hidden md:flex items-center space-x-4">
-          <Link to="/" className={linkClasses('/')}>
-            <BookOpen className="h-4 w-4 mr-2" />
-            Home
-          </Link>
-          <Link to="/search" className={linkClasses('/search')}>
-            <Search className="h-4 w-4 mr-2" />
-            Search
-          </Link>
-          <Link to="/api-docs" className={linkClasses('/api-docs')}>
-            <Code className="h-4 w-4 mr-2" />
-            API Docs
-          </Link>
-
+        <ul className="hidden md:flex items-center gap-4">
+          <li>
+            <Link to="/" className={navLinkClass('/')}>
+              <BookOpen className="h-4 w-4 mr-2" />
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link to="/search" className={navLinkClass('/search')}>
+              <Search className="h-4 w-4 mr-2" />
+              Search
+            </Link>
+          </li>
+          <li>
+            <Link to="/api-docs" className={navLinkClass('/api-docs')}>
+              <Code className="h-4 w-4 mr-2" />
+              API Docs
+            </Link>
+          </li>
+          <li>
+            <Link to="/contact" className={navLinkClass('/contact')}>
+              <Phone className="h-4 w-4 mr-2" />
+              Contact
+            </Link>
+          </li>
           {isAuthenticated ? (
             <>
-              <Link to="/admin" className={linkClasses('/admin')}>
-                <Upload className="h-4 w-4 mr-2" />
-                Admin
-              </Link>
-              <button
-                onClick={() => logout({ returnTo: window.location.origin })}
-                className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-              >
-                <LogOut className="h-4 w-4 mr-1" />
-                Logout
-              </button>
+              <li>
+                <Link to="/admin" className={navLinkClass('/admin')}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Admin
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={() => logout({ returnTo: window.location.origin })}
+                  className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  Logout
+                </button>
+              </li>
             </>
           ) : (
-            <button
-              onClick={() => loginWithRedirect()}
-              className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              Login
-            </button>
+            <li>
+              <button
+                onClick={loginWithRedirect}
+                className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Login
+              </button>
+            </li>
           )}
-          <Link to="/contact" className={linkClasses('/contact')}>
-            <Phone className="h-4 w-4 mr-2" />
-          </Link>
-        </div>
+        </ul>
 
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-200 focus:outline-none"
+          aria-label="Toggle navigation menu"
           aria-expanded={isOpen}
         >
           {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -78,57 +91,67 @@ const Navbar = () => {
       </header>
 
       {isOpen && (
-        <nav className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <Link to="/" className={mobileLinkClasses('/')} onClick={() => setIsOpen(false)}>
-            <p className="flex items-center">
-              <BookOpen className="h-4 w-4 mr-2" /> Home
-            </p>
-          </Link>
-          <Link to="/contact" className={mobileLinkClasses('/contact')} onClick={() => setIsOpen(false)}>
-            <p className="flex items-center">
-              <Phone className="h-4 w-4 mr-2" /> Contact
-            </p>
-          </Link>
-          <Link to="/search" className={mobileLinkClasses('/search')} onClick={() => setIsOpen(false)}>
-            <p className="flex items-center">
-              <Search className="h-4 w-4 mr-2" /> Search
-            </p>
-          </Link>
-          <Link to="/api-docs" className={mobileLinkClasses('/api-docs')} onClick={() => setIsOpen(false)}>
-            <p className="flex items-center">
-              <Code className="h-4 w-4 mr-2" /> API Docs
-            </p>
-          </Link>
-
-          {isAuthenticated ? (
-            <>
-              <Link to="/admin" className={mobileLinkClasses('/admin')} onClick={() => setIsOpen(false)}>
-                <p className="flex items-center">
-                  <Upload className="h-4 w-4 mr-2" /> Admin
-                </p>
+        <section className="md:hidden px-2 pt-2 pb-3 sm:px-3" aria-label="Mobile navigation">
+          <ul className="space-y-1">
+            <li>
+              <Link to="/" className={mobileLinkClass('/')} onClick={() => setIsOpen(false)}>
+                <BookOpen className="h-4 w-4 mr-2 inline" />
+                Home
               </Link>
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  logout({ returnTo: window.location.origin });
-                }}
-                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700 mt-2"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                loginWithRedirect();
-              }}
-              className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
-            >
-              Login
-            </button>
-          )}
-        </nav>
+            </li>
+            <li>
+              <Link to="/contact" className={mobileLinkClass('/contact')} onClick={() => setIsOpen(false)}>
+                <Phone className="h-4 w-4 mr-2 inline" />
+                Contact
+              </Link>
+            </li>
+            <li>
+              <Link to="/search" className={mobileLinkClass('/search')} onClick={() => setIsOpen(false)}>
+                <Search className="h-4 w-4 mr-2 inline" />
+                Search
+              </Link>
+            </li>
+            <li>
+              <Link to="/api-docs" className={mobileLinkClass('/api-docs')} onClick={() => setIsOpen(false)}>
+                <Code className="h-4 w-4 mr-2 inline" />
+                API Docs
+              </Link>
+            </li>
+            {isAuthenticated ? (
+              <>
+                <li>
+                  <Link to="/admin" className={mobileLinkClass('/admin')} onClick={() => setIsOpen(false)}>
+                    <Upload className="h-4 w-4 mr-2 inline" />
+                    Admin
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      logout({ returnTo: window.location.origin });
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    loginWithRedirect();
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  Login
+                </button>
+              </li>
+            )}
+          </ul>
+        </section>
       )}
     </nav>
   );

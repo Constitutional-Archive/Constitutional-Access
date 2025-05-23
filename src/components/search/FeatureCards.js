@@ -19,7 +19,7 @@ const ResultCard = ({ result }) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        content: result.fullText || result.excerpt || '',  // Replace with full doc if available
+        content: result.fullText || result.excerpt || '',
         history: [...messages, userMessage],
       })
     });
@@ -30,25 +30,25 @@ const ResultCard = ({ result }) => {
     setInput('');
   };
 
-  return React.createElement('div', {
+  return React.createElement('article', {
     className: 'bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow'
   },
-    React.createElement('div', { className: 'flex items-start space-x-4' },
-      React.createElement('div', { className: 'flex-shrink-0 mt-1 text-gray-400' },
+    React.createElement('header', { className: 'flex items-start gap-4' },
+      React.createElement('figure', { className: 'flex-shrink-0 mt-1 text-gray-400' },
         React.createElement(FileText, { className: 'w-6 h-6' })
       ),
-      React.createElement('div', { className: 'flex-1' },
-        React.createElement('div', { className: 'flex justify-between items-start' },
-          React.createElement('div', null,
+      React.createElement('section', { className: 'flex-1' },
+        React.createElement('header', { className: 'flex justify-between items-start' },
+          React.createElement('section', null,
             React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, title),
             React.createElement('p', { className: 'mt-2 text-gray-600' }, excerpt)
           ),
-          React.createElement('span', {
+          React.createElement('mark', {
             className: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
           }, `Relevance: ${relevance}`)
         ),
-        React.createElement('div', { className: 'mt-4 flex items-center space-x-6' },
-          React.createElement('span', { className: 'inline-flex items-center text-sm text-gray-500' }, type),
+        React.createElement('nav', { className: 'mt-4 flex items-center gap-6', 'aria-label': 'File actions' },
+          React.createElement('p', { className: 'text-sm text-gray-500' }, type),
           React.createElement('a', {
             href: fileUrl,
             target: '_blank',
@@ -65,22 +65,34 @@ const ResultCard = ({ result }) => {
             onClick: () => setShowChat(!showChat)
           }, showChat ? 'Close Chat' : '💬 Chat')
         ),
-        showChat && React.createElement('div', { className: 'mt-4 p-3 border rounded bg-gray-50 space-y-2' },
-          messages.map((msg, i) => (
-            React.createElement('div', {
+        showChat && React.createElement('aside', {
+          className: 'mt-4 p-3 border rounded bg-gray-50 space-y-2',
+          'aria-label': 'Chat with document'
+        },
+          ...messages.map((msg, i) => (
+            React.createElement('section', {
               key: i,
               className: msg.role === 'user' ? 'text-right text-blue-700' : 'text-left text-gray-700'
-            }, React.createElement('p', null, msg.content))
+            },
+              React.createElement('p', null, msg.content)
+            )
           )),
-          React.createElement('div', { className: 'flex space-x-2 mt-2' },
+          React.createElement('form', {
+            className: 'flex gap-2 mt-2',
+            onSubmit: (e) => {
+              e.preventDefault();
+              handleSend();
+            }
+          },
             React.createElement('input', {
               value: input,
               onChange: e => setInput(e.target.value),
               placeholder: 'Ask AI a question related to this document...',
-              className: 'flex-1 border px-2 py-1 rounded'
+              className: 'flex-1 border px-2 py-1 rounded',
+              required: true
             }),
             React.createElement('button', {
-              onClick: handleSend,
+              type: 'submit',
               className: 'bg-indigo-600 text-white px-3 py-1 rounded'
             }, 'Send')
           )
