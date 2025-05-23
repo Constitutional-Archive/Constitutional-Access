@@ -15,6 +15,7 @@ A full-stack web application for managing, organizing, and semantically searchin
 This application provides:
 
 - A secure **Admin Portal** for uploading and managing archival data with a hierarchical structure and metadata.
+- A Super-Admin interface to provide users with admin privileges to upload and manage data on the web app.
 - A **Public Search Interface** for querying the archive using **natural language**.
 - A scalable and modular **RESTful API** backend.
 - Full CI/CD automation and deployment on **Azure Cloud**.
