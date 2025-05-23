@@ -6,7 +6,7 @@ A full-stack web application for managing, organizing, and semantically searchin
 
 ## 🌐 Live Demo
 
-> 🧪 Deployed on [Microsoft Azure](ttps://happy-wave-077d83310.6.azurestaticapps.net/)
+> 🧪 Deployed on [Microsoft Azure](https://happy-wave-077d83310.6.azurestaticapps.net/)
 
 ---
 
