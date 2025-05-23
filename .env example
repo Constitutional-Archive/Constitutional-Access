@@ -1,0 +1,37 @@
+# === Azure Storage Configuration ===
+ACCOUNT_NAME=your_storage_account_name               # Azure storage account name
+CONTAINER_NAME=your_container_name                   # Name of the Azure blob container
+
+ACCESS_KEY=your_access_key                           # Azure storage access key (keep secret)
+SAS_TOKEN=your_sas_token                             # Shared Access Signature token (optional alternative to ACCESS_KEY)
+
+AZURE_STORAGE_CONNECTION_STRING=your_connection_string  # Full Azure Storage connection string (includes credentials)
+AZURE_STORAGE_KEY=your_storage_key                       # Storage account key
+AZURE_STORAGE_BLOB_ENDPOINT=https://youraccount.blob.core.windows.net/     # Blob endpoint URL
+AZURE_STORAGE_QUEUE_ENDPOINT=https://youraccount.queue.core.windows.net/   # Queue endpoint URL
+AZURE_STORAGE_FILE_ENDPOINT=https://youraccount.file.core.windows.net/     # File endpoint URL
+AZURE_STORAGE_TABLE_ENDPOINT=https://youraccount.table.core.windows.net/   # Table endpoint URL
+
+# === MongoDB Database Connection ===
+MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/dbname        # MongoDB connection URI
+
+# === OpenAI Configuration ===
+OPENAI_API_KEY=your_openai_api_key                     # API key for accessing OpenAI services
+
+# === Backend Configuration ===
+BACKEND_URL=https://your-backend-url.azurewebsites.net   # Public URL of your backend
+
+# === Internal API Key (e.g., for internal auth or service verification) ===
+API_KEY=your_internal_api_key                            # Custom internal API key (keep secret)
+
+# === React Frontend Configuration ===
+REACT_APP_SEARCH_BACKEND_URL=https://your-backend-url.azurewebsites.net  # URL to reach backend from frontend
+
+# === Auth0 Authentication Configuration ===
+AUTH0_DOMAIN=your-auth0-domain                        # Auth0 domain (e.g. dev-xxxxxx.us.auth0.com)
+AUTH0_CLIENT_ID=your-auth0-client-id                  # Auth0 Client ID
+AUTH0_CLIENT_SECRET=your-auth0-client-secret          # Auth0 Client Secret (keep secret)
+AUTH0_AUDIENCE=https://your-auth0-domain/api/v2/      # Audience for API authorization
+
+# === Auth0 Role Management ===
+ADMIN_ROLE_ID=your_admin_role_id                      # Auth0 Role ID for admin privileges
