@@ -15,22 +15,10 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Supported image extensions
-const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
-
-// Helper to detect if the URL is an image file
-const isImageUrl = (url) => {
-  if (!url) return false;
-  const parts = url.split(`files/`);
-  const blobNameWithQuery = parts[1] || '';
-  const blobName = decodeURI(blobNameWithQuery.split('?')[0] || '');
-  return imageExtensions.some(ext => blobName.toLowerCase().endsWith(ext));
-};
-
 // 🔊 Auto-trim audio to <25MB using ffmpeg, then transcribe
 async function transcribeAudio(originalFilePath) {
   const trimmedPath = path.join(os.tmpdir(), 'trimmed.mp3');
-  const durations = [100000,10000,6000, 45, 30, 15]; // Trim shorter if needed
+  const durations = [6000, 45, 30, 15]; // Try shorter durations if size too big
 
   for (let duration of durations) {
     try {
@@ -76,12 +64,6 @@ router.post('/chat-with-doc', async (req, res) => {
   console.log('📥 Received request with fileUrl:', fileUrl);
 
   try {
-    // Block image files early
-    if (isImageUrl(fileUrl)) {
-      return res.json({ reply: "This file is an image. Chatting on image content is not supported." });
-    }
-
-    // Download file
     const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
     const contentType = response.headers['content-type'] || mime.lookup(fileUrl);
     const fileExt = mime.extension(contentType);
@@ -90,7 +72,6 @@ router.post('/chat-with-doc', async (req, res) => {
 
     let extractedText = '';
 
-    // Handle file by type
     if (contentType.includes('pdf')) {
       const pdfData = await pdfParse(response.data);
       extractedText = pdfData.text.slice(0, 4000);
@@ -104,7 +85,6 @@ router.post('/chat-with-doc', async (req, res) => {
 
     fs.unlinkSync(tempFilePath); // cleanup
 
-    // Generate GPT reply
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
