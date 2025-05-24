@@ -30,7 +30,7 @@ const isImageUrl = (url) => {
 // 🔊 Auto-trim audio to <25MB using ffmpeg, then transcribe
 async function transcribeAudio(originalFilePath) {
   const trimmedPath = path.join(os.tmpdir(), 'trimmed.mp3');
-  const durations = [60, 45, 30, 15]; // Trim shorter if needed
+  const durations = [100000,10000,6000, 45, 30, 15]; // Trim shorter if needed
 
   for (let duration of durations) {
     try {
