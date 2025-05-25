@@ -6,7 +6,6 @@ import {
   Navigate 
 } from "react-router-dom";
 
-
 import RoleRedirect from "./pages/RoleRedirect";
 import AdminPage from "./pages/AdminPage";
 import HomePage from "./pages/HomePage";
@@ -23,11 +22,12 @@ import PendingApproval from "./pages/PendingApproval";
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Navbar />
-        <div className="flex-1 w-full">
+      <main className="min-h-screen bg-gray-50 flex flex-col">
+        <header>
+          <Navbar />
+        </header>
+        <section className="flex-1 w-full">
           <Routes>
-
             {/* 👇 Redirects based on role after login */}
             <Route path="/" element={<HomePage />} />
             <Route path="/redirect" element={<RoleRedirect />} />
@@ -64,8 +64,8 @@ function App() {
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </div>
-      </div>
+        </section>
+      </main>
     </Router>
   );
 }

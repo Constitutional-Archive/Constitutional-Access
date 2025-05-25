@@ -22,7 +22,7 @@ const hasRequiredRole = (userRoles, requiredRoles) => {
 const PrivateRoute = ({ children, requiredRoles = [] }) => {
   const { isAuthenticated, user, isLoading } = useAuth0();
 
-  if (isLoading) return <div>Loading...</div>;
+   if (isLoading) return <section aria-busy="true"><p>Loading...</p></section>;
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
 

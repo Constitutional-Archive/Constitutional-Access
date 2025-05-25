@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 const RoleRedirect = () => {
   const { isAuthenticated, isLoading, user } = useAuth0();
 
-  if (isLoading) return <div>Loading...</div>;
+   if (isLoading) return <section aria-busy="true"><p>Loading...</p></section>;
   if (!isAuthenticated) return <Navigate to="/home" replace />;
 
   const roles = user?.['https://constifind-api.com/roles'] || [];
