@@ -27,12 +27,12 @@ const isImageUrl = (url) => {
 
 // 🔊 Trims audio to multiple durations until under 25MB, then transcribes
 async function transcribeAudio(originalFilePath) {
-  const trimmedPath = path.join(os.tmpdir(), 'trimmed.mp3');
-  const durations = [30, 20, 10, 5]; // smaller durations to ensure under 25MB
+  const trimmedPath = path.join('./tmp', 'trimmed.mp3');
+  const durations = [30, 20, 10, 5];
 
   for (let duration of durations) {
     try {
-      console.log(`⏱️ Trying trim: ${duration}s`);
+      console.log(`⏱️ Trimming to ${duration}s`);
       await new Promise((resolve, reject) => {
         ffmpeg(originalFilePath)
           .setStartTime(0)
@@ -43,10 +43,10 @@ async function transcribeAudio(originalFilePath) {
           .run();
       });
 
-      const fileSize = fs.statSync(trimmedPath).size;
-      console.log(`📦 Trimmed to ${duration}s: ${fileSize} bytes`);
+      const size = fs.statSync(trimmedPath).size;
+      console.log(`📦 Trimmed file size: ${size} bytes`);
 
-      if (fileSize <= 25 * 1024 * 1024) {
+      if (size <= 25 * 1024 * 1024) {
         const formData = new FormData();
         formData.append('file', fs.createReadStream(trimmedPath));
         formData.append('model', 'whisper-1');
@@ -59,18 +59,16 @@ async function transcribeAudio(originalFilePath) {
         });
 
         fs.unlinkSync(trimmedPath);
-        console.log('✅ Transcription successful:', response.data.text.slice(0, 100));
         return response.data.text;
-      } else {
-        console.warn(`⚠️ Still too large after ${duration}s`);
       }
     } catch (err) {
-      console.warn(`❌ Error trimming at ${duration}s:`, err.message);
+      console.warn(`⚠️ Trim ${duration}s failed:`, err.message);
     }
   }
 
-  throw new Error('Unable to trim audio under 25MB');
+  throw new Error('Unable to trim audio under 25MB for transcription.');
 }
+
 
 router.post('/chat-with-doc', async (req, res) => {
   const { fileUrl, history } = req.body;
